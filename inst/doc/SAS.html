@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Hassan Pazira" />
+
+<meta name="date" content="2024-04-25" />
+
+<title>Using BFI in SAS</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 800px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 20px;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 0;
+padding: 4px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table:not([class]) {
+margin: auto;
+min-width: 40%;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table[summary="R argblock"] {
+width: 100%;
+border: none;
+}
+table:not([class]) th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table:not([class]) td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table:not([class]), table:not([class]) th, table:not([class]) td {
+border-left-style: none;
+border-right-style: none;
+}
+table:not([class]) tr.odd {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 13px;
+padding-bottom: 1px;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f5f5f5;
+border-radius: 3px;
+color: #333;
+}
+pre {
+overflow-x: auto;
+border-radius: 3px;
+margin: 5px 0 10px 0;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: white;
+border: #f5f5f5 1px solid;
+}
+pre:not([class]) code {
+color: #444;
+background-color: white;
+}
+code {
+font-family: monospace;
+font-size: 90%;
+}
+p > code, li > code {
+padding: 2px 4px;
+color: #d14;
+border: 1px solid #e1e1e8;
+white-space: inherit;
+}
+div.figure {
+text-align: center;
+}
+table > caption, div.figure p.caption {
+font-style: italic;
+}
+table > caption span, div.figure p.caption span {
+font-style: normal;
+font-weight: bold;
+}
+p {
+margin: 0 0 10px;
+}
+table:not([class]) {
+margin: auto auto 10px auto;
+}
+img:not([class]) {
+background-color: #FFFFFF;
+padding: 2px;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+max-width: 100%;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f5f5f5;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f5f5f5;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f5f5f5;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+div.r-help-page {
+background-color: #f9f9f9;
+border-bottom: #ddd 1px solid;
+margin-bottom: 10px;
+padding: 10px;
+}
+div.r-help-page:hover {
+background-color: #f4f4f4;
+}
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using BFI in SAS</h1>
+<h4 class="author">Hassan Pazira</h4>
+<h4 class="date">2024-04-25</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+<li><a href="#accessing-sas-services" id="toc-accessing-sas-services">Accessing SAS Services</a></li>
+<li><a href="#install-r-and-configure-with-sas" id="toc-install-r-and-configure-with-sas">Install R and Configure with
+SAS</a></li>
+<li><a href="#the-rlang-system-option" id="toc-the-rlang-system-option">The RLANG System Option</a></li>
+<li><a href="#using-proc-iml-and-rsubmit" id="toc-using-proc-iml-and-rsubmit">Using <code>PROC IML</code> and
+<code>Rsubmit</code></a></li>
+<li><a href="#example" id="toc-example">Example</a></li>
+<li><a href="#datasets-included-in-the-bfi-package" id="toc-datasets-included-in-the-bfi-package">Datasets included in the
+<code>BFI</code> package</a></li>
+<li><a href="#importing-the-data-from-r" id="toc-importing-the-data-from-r">Importing the data from R</a></li>
+<li><a href="#bfi-as-a-sas-package" id="toc-bfi-as-a-sas-package">BFI as
+a SAS Package</a></li>
+<li><a href="#contact" id="toc-contact">Contact</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level3">
+<h3>Introduction</h3>
+<p>The <code>BFI</code> package is a powerful tool in <strong>R</strong>
+designed to execute the <strong>Bayesian Federated Inference</strong>
+(<strong>BFI</strong>) methodology, supporting a wide range of
+regression models including <em>linear</em>, <em>logistic</em>, and
+<em>Cox</em> regression. While <strong>SAS</strong> offers robust
+statistical capabilities, it currently lacks a dedicated package for
+implementing the <em>BFI</em> method. Consequently, this vignette serves
+to bridge that gap by illustrating how to utilize the R package
+<code>BFI</code> within the SAS environment. By seamlessly integrating
+R’s <code>BFI</code> package with the analytical prowess of SAS, users
+gain access to a comprehensive suite of statistical techniques,
+enhancing their ability to conduct sophisticated data analyses,
+particularly when working with small datasets.</p>
+<p>In this guide, we’ll explore how you can leverage SAS to effectively
+utilize the <code>BFI</code> package for your data analysis needs.</p>
+<p>To utilize R within SAS, it’s assumed that you have access to a SAS
+server. This access allows you to establish a connection to a SAS
+session by providing the necessary connection parameters, such as the
+SAS server hostname, port number, and authentication credentials.</p>
+<p>More information about configuring the SAS system to call functions
+in the R language is documented in the <a href="https://support.sas.com/documentation/cdl/en/imlug/67502/HTML/default/viewer.htm#imlug_r_toc.htm">SAS
+Online Help</a>.</p>
+</div>
+<div id="accessing-sas-services" class="section level3">
+<h3>Accessing SAS Services</h3>
+<p>To access SAS services, you typically need to connect to a SAS
+server. Here’s how you can do it using <strong>SAS Studio</strong>,
+which is a web-based interface for SAS:</p>
+<p>Open a web browser and navigate to the URL provided by your SAS
+administrator for accessing <em>SAS Studio</em>. Enter your credentials
+to log in to SAS Studio. Once logged in, you can access SAS services
+such as analysis and reporting through the SAS Studio interface.</p>
+</div>
+<div id="install-r-and-configure-with-sas" class="section level3">
+<h3>Install R and Configure with SAS</h3>
+<p>SAS requires two configuration options in order to communicate with
+R. First the RLANG option must be set when SAS is started. This may be
+set either in a custom configuration file or on the SAS command line.
+Second, SAS needs an <em>R_HOME</em> environment variable to point it to
+the correct, available version of R.</p>
+</div>
+<div id="the-rlang-system-option" class="section level3">
+<h3>The RLANG System Option</h3>
+<p>The <em>RLANG system option</em> determines whether you have
+permission to call R from the SAS system. You can determine the value of
+the RLANG option by submitting the following SAS statements:</p>
+<pre class="sas"><code>proc options option=RLANG;
+run;</code></pre>
+<p>The result is one of the following statements in the SAS log:</p>
+<ul>
+<li><strong><em>NORLANG: Do not support access to R language
+interfaces</em></strong></li>
+</ul>
+<p>If the <em>SAS log</em> contains this statement, it means that R
+integration is disabled, and you do not have permission to call R from
+the SAS system :( You may need to consult with your SAS administrator or
+IT department to enable it.</p>
+<ul>
+<li><strong><em>RLANG: Support access to R language
+interfaces</em></strong></li>
+</ul>
+<p>If the <em>SAS log</em> contains this statement, it means that R
+integration is enabled, and you can call R from the SAS system :)</p>
+<div id="install-r" class="section level4">
+<h4>Install R</h4>
+<p>Download and install R from the official R website (<a href="https://www.r-project.org/" class="uri">https://www.r-project.org/</a>). Follow the installation
+instructions provided for your operating system.</p>
+</div>
+<div id="install-sasiml-interface-to-r" class="section level4">
+<h4>Install SAS/IML Interface to R</h4>
+<p>The <strong>SAS/IML Interface to R</strong> allows you to call R
+functions from within <code>PROC IML</code> (Interactive Matrix
+Language). Check if the interface is installed by running the following
+code within SAS:</p>
+<pre class="sas"><code>proc options option=R_HOME;
+run;</code></pre>
+<p>If the path to your R installation directory is displayed, the
+<em>SAS/IML Interface to R</em> is installed. If not, you may need to
+install or reinstall it.</p>
+</div>
+</div>
+<div id="using-proc-iml-and-rsubmit" class="section level3">
+<h3>Using <code>PROC IML</code> and <code>Rsubmit</code></h3>
+<p>You can use <strong>R</strong> inside <strong>SAS</strong> through
+the use of the <code>PROC IML</code> procedure. <code>PROC IML</code>
+allows you to execute R code within a <strong>SAS</strong> session,
+enabling integration between <strong>SAS</strong> and <strong>R</strong>
+for data analysis and statistical modeling.</p>
+<div id="installing-r-packages-from-cran-and-github-in-sas" class="section level4">
+<h4>Installing R packages from CRAN and GitHub in SAS:</h4>
+<p>To install an R package from <strong>CRAN</strong> and
+<strong>GitHub</strong>, you can use the <code>base</code>,
+<code>stats</code> and <code>remotes</code> packages, respectively. It
+can be done in R or in SAS. Here’s how you can do it within SAS:</p>
+<pre class="sas"><code>proc iml;
+
+  rsubmit;
+
+    /* First install and load &#39;base&#39;, &#39;stats&#39; and &#39;remotes&#39; from CRAN */
+    install.packages(&quot;base&quot;)
+    install.packages(&quot;stats&quot;)
+    install.packages(&quot;remotes&quot;)
+    library(base)
+    library(stats)
+    library(remotes)
+  
+    /* Then install and load BFI from GitHub */
+    remotes::install_github(&quot;hassanpazira/BFI&quot;, force = TRUE)
+    library(BFI)
+
+  endrsubmit;
+
+quit;</code></pre>
+<p>Now that you have the <code>BFI</code> package installed and
+configured, let’s explore its functionality through the following
+example.</p>
+</div>
+</div>
+<div id="example" class="section level3">
+<h3>Example</h3>
+<p>Now we generate two datasets independently from <em>Gaussian</em>
+distribution, and then apply main functions in the <code>BFI</code>
+package to these datasets:</p>
+<div id="simulate-data-for-two-local-centers" class="section level4">
+<h4>Simulate data for two local centers</h4>
+<p>First generate 30 samples randomly from Gaussian distribution N(0, 1)
+with p=3 covariates:</p>
+<pre class="sas"><code>proc iml;
+
+    /****************************************************************/
+    /* Center 1: Data simulation for local center 1 with 30 samples */
+    /****************************************************************/
+
+    p     = 3;   /* Number of variables */
+    n1    = 30;  /* Number of samples for center 1 */
+    theta = {1, 2, 2, 2, 1.5}; /* Define theta values directly */
+
+    X1  = j(n1, p); /* Initialize matrix X1 */
+    mu1 = j(n1, 1); /* Initialize vector mu1 */
+    y1  = j(n1, 1); /* Initialize vector y1 */
+
+    /* Generate data for center 1 */
+    call randseed(1123);
+    X1  = randfun(n1 || p, &quot;Normal&quot;, 0, 1);
+    mu1 = theta[1] + X1 * theta[2:4];
+    y1  = randfun(n1 || 1, &quot;Normal&quot;, mu1, sqrt(theta[5]));
+
+    /* Create dataset for center 1 */
+    create y1 var {&quot;y1&quot;};
+    append;
+    close y1;
+
+    create X1 from X1[colname={&quot;X1_1&quot; &quot;X1_2&quot; &quot;X1_3&quot;}];
+    append from X1;
+    close X1;
+
+    call ExportMatrixToR(X1, &quot;X1&quot;);
+    call ExportMatrixToR(y1, &quot;y1&quot;);
+
+quit;</code></pre>
+<p>Now generate 50 samples randomly from N(0, 1) with 3 covariates:</p>
+<pre class="sas"><code>proc iml;
+
+    /****************************************************************/
+    /* Center 2: Data simulation for local center 2 with 50 samples */
+    /****************************************************************/
+    p     = 3;   /* Number of variables */
+    n2    = 50;   /* Number of samples for center 2 */
+    theta = {1, 2, 2, 2, 1.5}; /* Define theta values directly */
+  
+    X2  = j(n2, p);
+    mu2 = j(n2, 1);
+    y2  = j(n2, 1);
+
+    /* Generate data for center 2 */
+    call randseed(1123);
+    X2  = randfun(n2 || p, &quot;Normal&quot;, 0, 1);
+    mu2 = theta[1] + X2 * theta[2:4];
+    y2  = randfun(n2 || 1, &quot;Normal&quot;, mu2, sqrt(theta[5]));
+
+    /* Create dataset for center 1 */
+    create y2 var {&quot;y2&quot;};
+    append;
+    close y2;
+
+    create X2 from X2[colname={&quot;X2_1&quot; &quot;X2_2&quot; &quot;X2_3&quot;}];
+    append from X2;
+    close X2;
+
+    call ExportMatrixToR(X2, &quot;X2&quot;);
+    call ExportMatrixToR(y2, &quot;y2&quot;);
+
+quit;</code></pre>
+<p>We have transferred SAS data to the R session and are currently
+initiating an analysis using the BFI method in R. All communications
+with R are facilitated through SAS’s <code>PROC IML</code>. It’s
+important to note that capitalization matters in R, and character
+variables are automatically converted into factors.</p>
+</div>
+<div id="map-estimates-at-the-local-centers" class="section level4">
+<h4>MAP estimates at the local centers</h4>
+<p>The following compute the Maximum A Posterior (MAP) estimators of the
+parameters for center 1:</p>
+<pre class="sas"><code>proc iml;
+  
+  rsubmit;
+
+    #---------------------------
+    # Inverse Covariance Matrix
+    #---------------------------
+    # Creating the inverse covariance matrix for the Gaussian prior distribution:
+    Lambda &lt;- inv.prior.cov(X1, lambda=0.05, family=gaussian)
+
+    #--------------------------
+    # MAP estimates at center 1
+    #--------------------------
+    fit1       &lt;- MAP.estimation(y1, X1, family=gaussian, Lambda)
+    theta_hat1 &lt;- fit1$theta_hat # intercept and coefficient estimates
+    A_hat1     &lt;- fit1$A_hat     # minus the curvature matrix
+    summary(fit1, cur_mat=TRUE)
+
+  endrsubmit;
+
+quit;</code></pre>
+<p>Obtaining the MAP estimators of the parameters for center 2 using the
+following:</p>
+<pre class="sas"><code>proc iml;
+
+  rsubmit;
+    
+    # Creating the inverse covariance matrix for the Gaussian prior distribution:
+    Lambda &lt;- inv.prior.cov(X2, lambda=0.05, family=gaussian)
+
+    #--------------------------
+    # MAP estimates at center 2
+    #--------------------------
+    fit2       &lt;- MAP.estimation(y2, X2, family=gaussian, Lambda)
+    theta_hat2 &lt;- fit2$theta_hat
+    A_hat2     &lt;- fit2$A_hat
+    summary(fit2, cur_mat=TRUE)
+
+  endrsubmit;
+
+quit;</code></pre>
+</div>
+<div id="bfi-at-central-center" class="section level4">
+<h4>BFI at central center</h4>
+<p>Now, you can utilize the primary function <code>bfi()</code> to
+acquire the BFI estimates:</p>
+<pre class="sas"><code>proc iml;
+
+  rsubmit;
+  
+    # Creating the inverse covariance matrix for central server:
+    Lambda &lt;- inv.prior.cov(X1, lambda=0.05, family=gaussian) # the same as other centers
+  
+    #----------------------
+    # BFI at central center
+    #----------------------
+    A_hats     &lt;- list(A_hat1, A_hat2)
+    theta_hats &lt;- list(theta_hat1, theta_hat2)
+    bfi        &lt;- bfi(theta_hats, A_hats, Lambda)
+    summary(bfi, cur_mat=TRUE)
+
+  endrsubmit;
+
+  call ImportMatrixFromR(bfi, &quot;bfi&quot;);
+  
+quit;</code></pre>
+</div>
+</div>
+<div id="datasets-included-in-the-bfi-package" class="section level3">
+<h3>Datasets included in the <code>BFI</code> package</h3>
+<p>In order to find and use the datasets available from the
+<code>BFI</code> package, use the following codes:</p>
+<pre class="sas"><code>proc iml;
+
+  rsubmit;
+  
+    # To find a list of all datasets included in the package
+    print(data(package = &quot;BFI&quot;))  
+  
+    # To use the &#39;Nurses&#39; data
+    BFI::Nurses
+    cat(&quot;Dimension of the &#39;Nurses&#39; data: \n&quot;, dim(Nurses))
+    cat(&quot;Colnames of the &#39;Nurses&#39; data: \n&quot;, colnames(Nurses))
+
+    # To use the &#39;trauma&#39; data
+    BFI::trauma
+    cat(&quot;Dimension of the &#39;trauma&#39; data: \n&quot;, dim(trauma))
+    cat(&quot;Colnames of the &#39;trauma&#39; data: \n&quot;, colnames(trauma))
+
+  endrsubmit;
+
+quit;</code></pre>
+</div>
+<div id="importing-the-data-from-r" class="section level3">
+<h3>Importing the data from R</h3>
+<p>R objects and data may be brought back into SAS as well, for any
+manipulation you might want to do in SAS. Here, we just grab the
+<em>bfi</em> object and the <em>Nurses</em> data from R and print the
+data in SAS.</p>
+<pre class="sas"><code>proc iml;
+  submit / R;  * &#39;rsubmit&#39; is equivalent to &#39;submit / R&#39; ;
+
+   # Export &#39;bfi&#39; object
+   ExportDataSetToSAS(bfi)
+
+   # Export dataset &#39;Nurses&#39;
+   ExportDataSetToSAS(Nurses)
+   
+  endsubmit;
+run;
+  
+proc print data=Nurses;
+run;</code></pre>
+</div>
+<div id="bfi-as-a-sas-package" class="section level3">
+<h3>BFI as a SAS Package</h3>
+<p>In the near future, we will be releasing the SAS/IML package for BFI,
+which can be installed by the <code>PACKAGE INSTALL</code> statement in
+the SAS environment.</p>
+</div>
+<div id="contact" class="section level3">
+<h3>Contact</h3>
+<p>If you find any errors, have any suggestions, or would like to
+request that something be added, please file an issue at <a href="https://github.com/hassanpazira/BFI/issues/">issue report</a> or
+send an email to: <a href="mailto:hassan.pazira@radboudumc.nl" class="email">hassan.pazira@radboudumc.nl</a>.</p>
+</div>
+
+<script type="text/javascript">
+window.onload = function() {
+  var i, fig = 1, caps = document.getElementsByClassName('caption');
+  for (i = 0; i < caps.length; i++) {
+    var cap = caps[i];
+    if (cap.parentElement.className !== 'figure' || cap.nodeName !== 'P')
+      continue;
+    cap.innerHTML = '<span>Figure ' + fig + ':</span> ' + cap.innerHTML;
+    fig++;
+  }
+  fig = 1;
+  caps = document.getElementsByTagName('caption');
+  for (i = 0; i < caps.length; i++) {
+    var cap = caps[i];
+    if (cap.parentElement.nodeName !== 'TABLE') continue;
+    cap.innerHTML = '<span>Table ' + fig + ':</span> ' + cap.innerHTML;
+    fig++;
+  }
+}
+</script>
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
