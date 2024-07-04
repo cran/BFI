@@ -15,7 +15,7 @@ output:
 description: |
   How to use the BFI package in SAS environments.
 vignette: >
-  %\VignetteIndexEntry{Calling BFI from SAS}
+  %\VignetteIndexEntry{Using BFI in SAS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -29,7 +29,7 @@ opts_chunk$set(
 
 ### Introduction
 
-The `BFI` package is a powerful tool in **R** designed to execute the **Bayesian Federated Inference** (**BFI**) methodology, supporting a wide range of regression models including *linear*, *logistic*, and *Cox* regression. While **SAS** offers robust statistical capabilities, it currently lacks a dedicated package for implementing the *BFI* method. Consequently, this vignette serves to bridge that gap by illustrating how to utilize the R package `BFI` within the SAS environment. By seamlessly integrating R's `BFI` package with the analytical prowess of SAS, users gain access to a comprehensive suite of statistical techniques, enhancing their ability to conduct sophisticated data analyses, particularly when working with small datasets.
+The `BFI` package is a powerful tool in **R** designed to execute the **Bayesian Federated Inference** (**BFI**) methodology, supporting a wide range of regression models including *linear*, *logistic*, and *survival* regression. While **SAS** offers robust statistical capabilities, it currently lacks a dedicated package for implementing the *BFI* method. Consequently, this vignette serves to bridge that gap by illustrating how to utilize the R package `BFI` within the SAS environment. By seamlessly integrating R's `BFI` package with the analytical prowess of SAS, users gain access to a comprehensive suite of statistical techniques, enhancing their ability to conduct sophisticated data analyses, particularly when working with small datasets.
 
 In this guide, we'll explore how you can leverage SAS to effectively utilize the `BFI` package for your data analysis needs.
 
@@ -94,17 +94,18 @@ proc iml;
 
   rsubmit;
 
-    /* First install and load 'base', 'stats' and 'remotes' from CRAN */
+    /* First install and load 'base', 'stats' and 'BFI'from CRAN */
     install.packages("base")
     install.packages("stats")
-    install.packages("remotes")
+    install.packages("BFI")  /* To install BFI from CRAN */
     library(base)
     library(stats)
-    library(remotes)
-  
-    /* Then install and load BFI from GitHub */
-    remotes::install_github("hassanpazira/BFI", force = TRUE)
     library(BFI)
+  
+    /* To install BFI from GitHub (if nessecary) */
+    /* install.packages("remotes") */
+    /* library(remotes) */
+    /* remotes::install_github("hassanpazira/BFI", force = TRUE) */
 
   endrsubmit;
 

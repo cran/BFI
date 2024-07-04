@@ -12,7 +12,7 @@
 
 <meta name="author" content="Hassan Pazira" />
 
-<meta name="date" content="2024-04-25" />
+<meta name="date" content="2024-07-03" />
 
 <title>Using BFI in SAS</title>
 
@@ -277,7 +277,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Using BFI in SAS</h1>
 <h4 class="author">Hassan Pazira</h4>
-<h4 class="date">2024-04-25</h4>
+<h4 class="date">2024-07-03</h4>
 
 
 <div id="TOC">
@@ -305,7 +305,7 @@ a SAS Package</a></li>
 designed to execute the <strong>Bayesian Federated Inference</strong>
 (<strong>BFI</strong>) methodology, supporting a wide range of
 regression models including <em>linear</em>, <em>logistic</em>, and
-<em>Cox</em> regression. While <strong>SAS</strong> offers robust
+<em>survival</em> regression. While <strong>SAS</strong> offers robust
 statistical capabilities, it currently lacks a dedicated package for
 implementing the <em>BFI</em> method. Consequently, this vignette serves
 to bridge that gap by illustrating how to utilize the R package
@@ -399,17 +399,18 @@ can be done in R or in SAS. Here’s how you can do it within SAS:</p>
 
   rsubmit;
 
-    /* First install and load &#39;base&#39;, &#39;stats&#39; and &#39;remotes&#39; from CRAN */
+    /* First install and load &#39;base&#39;, &#39;stats&#39; and &#39;BFI&#39;from CRAN */
     install.packages(&quot;base&quot;)
     install.packages(&quot;stats&quot;)
-    install.packages(&quot;remotes&quot;)
+    install.packages(&quot;BFI&quot;)  /* To install BFI from CRAN */
     library(base)
     library(stats)
-    library(remotes)
-  
-    /* Then install and load BFI from GitHub */
-    remotes::install_github(&quot;hassanpazira/BFI&quot;, force = TRUE)
     library(BFI)
+  
+    /* To install BFI from GitHub (if nessecary) */
+    /* install.packages(&quot;remotes&quot;) */
+    /* library(remotes) */
+    /* remotes::install_github(&quot;hassanpazira/BFI&quot;, force = TRUE) */
 
   endrsubmit;
 

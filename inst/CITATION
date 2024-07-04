@@ -3,7 +3,6 @@ bibentry(
   title    = "BFI: Bayesian Federated Inference",
   author   = "Hassan Pazira, Emanuele Massa, Marianne A. Jonker",
   year     = "2024",
-  note = "R package version 1.1.4",
-  url      = "https://hassanpazira.github.io/BFI/",
-  doi      = ""
+  note = "R package version 2.0.1",
+  url      = "https://CRAN.R-project.org/package=BFI"
 )
