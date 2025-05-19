@@ -1,3 +1,5 @@
+## This file created by Hassan Pazira
+
 #' @export
 
 n.par <- function(X, family = c("gaussian", "binomial", "survival")){

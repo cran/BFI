@@ -5,32 +5,20 @@
 
 <!-- badges: start -->
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/BFI)](https://cran.r-project.org/package=BFI)
-[![](https://cranlogs.r-pkg.org/badges/BFI)](https://CRAN.R-project.org/package=BFI)
+[![CRAN total downloads](https://cranlogs.r-pkg.org/badges/grand-total/BFI)](https://cran.r-project.org/package=BFI)
+[![CRAN monthly downloads](https://cranlogs.r-pkg.org/badges/BFI)](https://CRAN.R-project.org/package=BFI)
 [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![MIT
-license](https://img.shields.io/badge/license-MIT-brightgreen.svg)]( https://opensource.org/license/mit)
+[![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)]( https://opensource.org/license/mit)
 [![code size](https://img.shields.io/github/languages/code-size/hassanpazira/BFI.svg)](https://github.com/hassanpazira/BFI)
-
-
-<!-- badges: 
-[![R-CMD-check](https://github.com/hassanpazira/BFI/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hassanpazira/BFI/actions/workflows/R-CMD-check.yaml)
-[![R build status](https://github.com/hassanpazira/BFI/workflows/R-CMD-check/badge.svg)](https://github.com/hassanpazira/BFI/actions)
-[![Build
-Status](https://ci.appveyor.com/api/projects/status/github/hassanpazira/BFI?branch=master&svg=true)](https://ci.appveyor.com/project/hassanpazira/BFI/branch/master)
-[![codecov.io](https://codecov.io/github/hassanpazira/BFI/coverage.svg?branch=master)](https://app.codecov.io/github/hassanpazira/BFI/branch/master)
-[![](https://codecov.io/gh/hassanpazira/BFI/branch/master/graph/badge.svg)](https://codecov.io/gh/hassanpazira/BFI)
-[![CodeFactor](https://www.codefactor.io/repository/github/hassanpazira/BFI/badge)](https://www.codefactor.io/repository/github/hassanpazira/BFI)
--->
-
 <!-- badges: end -->
 
 ## Description
 
-Due to the limited size of the available data sets especially in rare diseases, it is sometimes challenging to identify the most relevant predictive features using multivariable statistical analysis. This issue may be resolved by combining data from multiple centers into one centralized location without sharing their data with each other, but doing so is difficult in reality because of privacy and security concerns.
+Due to the limited size of the available data sets, especially in rare diseases, identifying the most relevant predictive features using multivariable statistical analysis can be challenging. This issue may be resolved by combining data from multiple centers into one centralized location without sharing their data with each other, but doing so is difficult in reality because of privacy and security concerns.
 
-To address these challenges, we developed and implemented a Bayesian Federated Inference (BFI) framework for multicenter data. It aims to leverage the statistical power of larger (combined) data sets without requiring all the data to be aggregated in one location. The BFI framework allows each center using their own local data to infer the optimal parameter values as well as additional features of the posterior parameter distribution to be able to gather more information which is not captured by alternative techniques. One of the benefit of BFI over alternative approaches is that, only one inference cycle across the centers is required in BFI.
+To address these challenges, we developed and implemented a Bayesian Federated Inference (BFI) framework for multicenter data. It aims to leverage the statistical power of larger (combined) data sets without requiring all the data to be aggregated in one location. The BFI framework enables each center to use its own local data to infer the optimal parameter values and additional features of the posterior distribution, providing insights not captured by alternative techniques. One of the benefits of BFI over alternative approaches is that only one inference cycle across the centers is required in BFI.
 
-An R package called `BFI` is created to perform Bayesian Federated Inference. The following instructions will install the development version of the `BFI` package to a computer.
+An R package called `BFI` has been created to perform Bayesian Federated Inference. The following instructions will install the development version of the `BFI` package to a computer.
 Python and SAS users can also apply the BFI methodology in their respective environments.
 For instructions, see [here for Python](https://hassanpazira.github.io/BFI/articles/Python.html) and [here for SAS](https://hassanpazira.github.io/BFI/articles/SAS.html).
 
@@ -58,16 +46,11 @@ install.packages("BFI")
 library(BFI)
 ```
 
-### Installing from Github
-To install the `BFI` package directly from Github, you need to have the **devtools** package. So type the following:
+### Installing from GitHub
+To install the `BFI` package directly from GitHub, you need to have the **devtools** package. So type the following to install and then load it:
 
 ``` r
-if(!require(devtools)) {install.packages("devtools")}
-```
-
-and then load it by typing:
-
-``` r
+install.packages("devtools")
 library(devtools)
 ```
 
@@ -85,7 +68,7 @@ library(BFI)
 
 ## Update
 
-The latest version of the `BFI`package is `2.0.1`. To check the current version of `BFI` installed in your R library, use:
+The latest version of the `BFI`package is `3.0.1`. To check the current version of `BFI` installed in your R library, use:
 
 ``` r
 packageVersion("BFI")
@@ -223,7 +206,7 @@ Here are some of technical papers of the package:
 
 -   [BFI for Survival Models](https://arxiv.org/abs/2404.17464)
 
--   [BFI in Heterogeneous Populations](https://arxiv.org/abs/2402.02898)
+-   [BFI in Heterogeneous Populations](https://doi.org/10.1017/rsm.2025.6)
 
 
 ## Contact

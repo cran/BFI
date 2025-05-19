@@ -4,15 +4,29 @@
 
 bfi <- function(theta_hats = NULL, A_hats, Lambda,
                 family = c("gaussian", "binomial", "survival"),
+                basehaz = c("weibul","exp","gomp","poly","pwexp","unspecified"),
                 stratified = FALSE, strat_par = NULL, center_spec = NULL,
-                basehaz = c("weibul","exp","gomp","poly","pwexp"),
-                theta_A_polys = NULL, q_ls, center_zero_sample = FALSE,
-                which_cent_zeros, zero_sample_covs, refer_cats, zero_cats,
-                lev_no_ref_zeros) {
+                theta_A_polys = NULL, treat_round = NULL, for_ATE = NULL, p, q_ls,
+                center_zero_sample = FALSE, which_cent_zeros, zero_sample_covs,
+                refer_cats, zero_cats, lev_no_ref_zeros) {
   family <- match.arg(family)
   basehaz <- match.arg(basehaz)
   if (!is.null(theta_hats) & !is.list(theta_hats)) {
     stop("The input for 'theta_hats' should be a list.")
+  }
+  if (!is.null(treat_round)) {
+    if (treat_round == "first" & !is.null(for_ATE)) stop("In the first round, 'for_ATE' must be 'NULL'.")
+    if (treat_round == "first" & is.null(for_ATE)) family <- c("binomial")
+    if (treat_round == "second") {
+      if (family == "survival") {
+        if (!is.null(for_ATE))
+          stop("In the second round, 'for_ATE' must be NULL for survival.")
+      } else {
+        if (is.null(for_ATE)) stop("In the second round, 'for_ATE' must be a list.")
+      }
+    }
+  } else {
+    if (!is.null(for_ATE)) stop("If 'treat_round' is NULL, 'for_ATE' must be NULL.")
   }
   if (family == "survival" & basehaz == "poly" & is.null(theta_A_polys)) {
     stop("When family='survival' and basehaz='poly', 'theta_A_polys' cannot be NULL.")
@@ -35,9 +49,6 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
   }
   if (!is.null(theta_A_polys) & length(theta_A_polys)<2) {
     stop("Length of 'theta_A_polys' should be equal to L (which is > 1).")
-  }
-  if (stratified == TRUE & !is.null(theta_A_polys)) {
-    stop("If 'theta_A_polys' is not NULL, 'stratified' cannot be TRUE.")
   }
   if (is.null(theta_A_polys)) {
     if (!is.list(A_hats)) {
@@ -63,6 +74,11 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
     stop("Since 'stratified = FALSE', both 'strat_par' and 'center_spec'
          sould be NULL.")
   }
+  if (stratified == TRUE & !is.null(strat_par) & family == "survival" & basehaz == "unspecified") {
+    stop("For the 'unspecified' baseline hazard, 'strat_par' can not be used.")
+  }
+  old_strat_par <- strat_par
+  strat_par <- sort(strat_par)
   if (is.data.frame(Lambda)) {
     Lambda <- as.matrix(Lambda)
   }
@@ -75,10 +91,20 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       if (is.null(colnames(A_hats[[l]]))) stop("Colnames of 'A_hat's cannot be NULL.")
       equal_names_A_hat[[l]] <- colnames(A_hats[[l]])
     }
-    if (!all(equal_names_theta[[1]] == unlist(equal_names_theta)))
-      stop("Names of 'theta_hat's (or their order) are not the same across centers")
-    if (!all(equal_names_A_hat[[1]] == unlist(equal_names_A_hat)))
-      stop("Colnames of 'A_hat's (or their order) are not the same across centers")
+    if (!all(equal_names_theta[[1]] == unlist(equal_names_theta))) {
+      if (all(sapply(equal_names_theta, function(x) all(sort(x) == sort(equal_names_theta[[1]]))))) {
+        theta_hats <- lapply(theta_hats, function(x) x[order(names(x))])
+      } else {
+        stop("Names of 'theta_hat's are not the same across centers")
+      }
+    }
+    if (!all(equal_names_A_hat[[1]] == unlist(equal_names_A_hat))) {
+      if (all(sapply(equal_names_A_hat, function(x) all(sort(x) == sort(equal_names_A_hat[[1]]))))) {
+        A_hats <- lapply(A_hats, function(x) x[order(rownames(x)), order(colnames(x))])
+      } else {
+        stop("Colnames/Rownames of 'A_hat's are not the same across centers")
+      }
+    }
   } else {
     L <- length(theta_A_polys)
     for (l in seq_len(L)) {
@@ -90,10 +116,42 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
         stop("Colnames of 'A_hat's in 'theta_A_polys' cannot be NULL.")
       equal_names_A_hat[[l]] <- rownames(theta_A_polys[[l]][,,2])
     }
-    if (!all(equal_names_theta[[1]] == unlist(equal_names_theta)))
-      stop("Names of 'theta_hat's (or their order) are not the same across centers")
-    if (!all(equal_names_A_hat[[1]] == unlist(equal_names_A_hat)))
-      stop("Colnames of 'A_hat's (or their order) are not the same across centers")
+    if (!all(equal_names_theta[[1]] == unlist(equal_names_theta))) {
+      if (all(sapply(equal_names_theta, function(x) all(sort(x) == sort(equal_names_theta[[1]]))))) {
+        theta_A_polys_changes_theta <- lapply(seq_along(theta_A_polys), function(l) {
+          x <- theta_A_polys[[l]]
+          nr <- nrow(x[,,1])
+          q_lsr <- q_ls[l]
+          if ((q_lsr+1) >= nr) stop("q_ls[l] is too large; cannot exclude all rows from sorting.")
+          sorted_indices <- order(rownames(x[1:(nr - q_lsr - 1), , 1]))
+          x[c(sorted_indices, (nr - q_lsr):nr), , 1]
+        })
+        for (ll in seq_along(theta_A_polys)) {
+          theta_A_polys[[ll]][,,1] <- theta_A_polys_changes_theta[[ll]]
+        }
+      } else {
+        stop("Names of 'theta_hat's are not the same across centers")
+      }
+    }
+    if (!all(equal_names_A_hat[[1]] == unlist(equal_names_A_hat))) {
+      if (all(sapply(equal_names_A_hat, function(x) all(sort(x) == sort(equal_names_A_hat[[1]]))))) {
+        theta_A_polys_changes_A <- lapply(seq_along(theta_A_polys), function(l) {
+          x <- theta_A_polys[[l]]
+          nr <- nrow(x[,,1])
+          q_lsr <- q_ls[l]
+          if ((q_lsr+1) >= nr) stop("q_ls[l] is too large; cannot exclude all rows from sorting.")
+          sorted_indices <- order(rownames(x[1:(nr - q_lsr - 1), , 1]))
+          x[c(sorted_indices, (nr - q_lsr):nr), c(sorted_indices, (nr - q_lsr):nr), 2:(q_lsr+2)]
+        })
+        for (ll in seq_along(theta_A_polys)) {
+          theta_A_polys[[ll]][,,-1] <- theta_A_polys_changes_A[[ll]]
+          # Directly modifying rownames(theta_A_polys[[ll]][,,1]) does NOT work in a 3D array!
+          dimnames(theta_A_polys[[ll]])[[1]] <- rownames(theta_A_polys_changes_theta[[ll]])
+        }
+      } else {
+        stop("Colnames/Rownames of 'A_hat's are not the same across centers")
+      }
+    }
   }
   if (L == 1) stop("The number of locations should be > 1.")
   if (is.matrix(Lambda) | (is.list(Lambda) & length(Lambda) == 1)) {
@@ -122,53 +180,13 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       stop("Lambda should be a list.")
     }
   }
-  if (stratified == TRUE & !is.null(strat_par)) {
-    if ((!1 %in% strat_par) & (!2 %in% strat_par)) {
-      stop("'strat_par' should contain '1' and/or '2'.")
-    }
-    if (is.null(theta_hats)) {
-      stop("In stratified analysis, 'theta_hats' should not be 'NULL'.")
-    }
-    if (family == "gaussian") {
-      if (!is.numeric(strat_par)) {
-        stop("'strat_par' should be one of the integers: 1 or 2, or a vector of both.")
-      }
-      if (length(strat_par) > 2) {
-        stop("For this family ('gaussian') the number of 'strat_par' parameters
-             is two, i.e., 'intercept' and 'sigma2'.")
-      }
-      if (names(theta_hats[[1]])[1] != "(Intercept)") {
-        if (length(strat_par) > 1 | 1 %in% strat_par) {
-          stop("Since 'intercept = FALSE', for this family ('gaussian')
-               'strat_par' should only be the integer 2")
-        }
-      }
-    }
-    if (family == "binomial") {
-      if (names(theta_hats[[1]])[1] != "(Intercept)") {
-        stop("Since 'intercept = FALSE', for this family ('binomial')
-             the stratified analysis is not possible!")
-      }
-      if (!is.numeric(strat_par)) {
-        stop("'strat_par' should be an integer")
-      }
-      if (length(strat_par) > 1) {
-        stop("For this family ('binomial') the number of 'strat_par' parameters
-             is one, i.e., 'intercept'.")
-      }
-      if (strat_par == 2) {
-        stop("'strat_par' should only be the integer 1")
-      }
-    }
-  }
   if (family == "survival" & basehaz == "poly") {
     if (length(q_ls) != 1) {
       if (length(q_ls) != L) stop("Length of 'q_ls' should be ", sQuote(L),".")
     }
     q_max <- max(q_ls)
     omega_len <- q_max + 1
-    p <- dim(theta_A_polys[[1]])[[1]] -
-      length(grep("omega",rownames(theta_A_polys[[1]])))
+    p <- dim(theta_A_polys[[1]])[[1]] - length(grep("omega",rownames(theta_A_polys[[1]])))
     theta_len <- p + omega_len  # for the zero-patients case, 'p' can differ!
     colnames_X <- rownames(theta_A_polys[[1]])[1:p]
     for (i in seq_len(L)) {
@@ -320,8 +338,59 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
   if (all(n_pars == n_pars[1])) {
     n_par <- n_pars[1]
   } else {
-    stop("All matrices in A_hats should have the same columns.
+    stop("All matrices in 'A_hats' should have the same columns.
          Number of parameters in locations must be equal.")
+  }
+  if (stratified == TRUE & !is.null(strat_par)) {
+    if (is.null(theta_hats)) {
+      stop("In stratified analysis, 'theta_hats' should not be 'NULL'.")
+    }
+    if (any(duplicated(strat_par))) stop("There shouldn't be any duplicates in 'strat_par'.")
+    if (family == "gaussian") {
+      if (!all(strat_par %in% c(1, 2))) {
+        stop("'strat_par' should contain '1' and/or '2'.")
+      }
+      if (!is.numeric(strat_par)) {
+        stop("'strat_par' should be one of the integers: 1 or 2, or a vector of both.")
+      }
+      if (length(strat_par) > 2) {
+        stop("For this family ('gaussian'), the number of elements of 'strat_par'
+             is two, i.e., 'intercept' and 'sigma2'.")
+      }
+      if (names(theta_hats[[1]])[1] != "(Intercept)") {
+        if (length(strat_par) > 1 | 1 %in% strat_par) {
+          stop("Since 'intercept = FALSE', for this family ('gaussian')
+               'strat_par' should only be the integer 2")
+        }
+      }
+    }
+    if (family == "binomial") {
+      if (names(theta_hats[[1]])[1] != "(Intercept)") {
+        stop("Since 'intercept = FALSE', for this family ('binomial')
+             the stratified analysis is not possible!")
+      }
+      if (!is.numeric(strat_par)) {
+        stop("'strat_par' should be an integer.")
+      }
+      if (length(strat_par) > 1) {
+        stop("For this family ('binomial'), the number of elements of 'strat_par' is one, i.e., 'intercept'.")
+      }
+      if (strat_par == 2) {
+        stop("'strat_par' should only be the integer 1")
+      }
+    }
+    if (family == "survival") {
+      if (!is.numeric(strat_par)) {
+        stop("'strat_par' should contain integers.")
+      }
+      if (length(strat_par) > (n_par - p)) {
+        stop("Maximum length of 'strat_par' can be the number of parameters of the baseline hazard, ",
+             (n_par - p))
+      }
+      if (!all(strat_par %in% seq_len(n_par - p))) {
+        stop("All elements of 'strat_par' should be chosen from the integers: ", seq_len(n_par - p))
+      }
+    }
   }
   last_Lam_dim <- dim(Lambda_all[[L + 1]])[1]
   if (stratified == FALSE) {
@@ -339,44 +408,73 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
     } else {
       theta_hat_bfi <- theta_hats
     }
+    if (!is.null(for_ATE)) { # only for "binomial" and 'gaussian'!
+      if (!is.list(for_ATE)) {
+        stop("The input for 'for_ATE' should be a list.")
+      }
+      sum_over_L <- Reduce("+", for_ATE)
+      m1 <- sum_over_L[1] # treatment
+      m2 <- sum_over_L[2] # control
+      N <- m1 + m2
+      ATE1 <- (sum_over_L[6] - sum_over_L[8]) / N
+      ATE2 <- (sum_over_L[6]/sum_over_L[5]) - (sum_over_L[8]/sum_over_L[7])
+      ATE <- list(IPTW=ATE1, wIPTW=ATE2)
+      # sample_var <- list(
+      #   treatment = (sum_over_L[4]/(m1-1)) - (m1/(m1-1))*(sum_over_L[3]/m1)^2,
+      #   control = (sum_over_L[4]/(m2-1)) - (m2/(m2-1))*(sum_over_L[3]/m2)^2
+      # )
+    } else {
+      ATE <- NULL
+      # sample_var <- NULL
+    }
   } else {
     if (last_Lam_dim == dim(Lambda_all[[1]])[1]) {
       if (all(colnames(Lambda_all[[1]]) == colnames(Lambda_all[[L + 1]]))) {
-        stop("The last matrix in 'Lambda' should not have the same dim. as the
-             other local matrices.")
+        stop("The last matrix in 'Lambda' should not have the same dim. as the other local matrices.")
       } else {
-        if (length(strat_par) == 1) {
+        if (length(strat_par) == 1 & family != "survival") {
           if (1 %in% strat_par) {
             if (colnames(Lambda_all[[1]])[ncol(Lambda_all[[1]])] !=
                 colnames(Lambda_all[[L + 1]])[ncol(Lambda_all[[L + 1]])]) {
-              stop("Check the elements of 'Lambda'. Is there an 'Sigma2'
-                   in the model?")
+              stop("Check the elements of 'Lambda'. Is there an 'Sigma2' in the model?")
             }
           } else {
             if (colnames(Lambda_all[[1]])[1] != colnames(Lambda_all[[L + 1]])[1]) {
-              stop("Check the elements of 'Lambda'.
-                   Is there an 'intercept' in the model?")
+              stop("Check the elements of 'Lambda'. Is there an 'intercept' in the model?")
             }
           }
         }
       }
     }
     if (is.null(center_spec)) {
-      if (length(strat_par) == 1) {
-        if (1 %in% strat_par) {
-          strat_par <- c(1)
-          noncore <- cbind(seq_len(L))
-          new_noncore <- noncore
-        } else {
-          strat_par <- c(length(theta_hats[[1]]))
-          noncore <- cbind((last_Lam_dim - L + 1):last_Lam_dim)
-          new_noncore <- as.matrix(seq_len(L)) # noncore - (L+1) #
+      if (family == "survival") {
+        for (i in 1:length(strat_par)) {
+          if (i == 1) {
+            noncore <- cbind(p + (strat_par[i] - 1) * L + (1:L))
+            new_noncore <- cbind(seq_len(L))
+          } else {
+            noncore <- cbind(noncore, p + (strat_par[i] - 1) * L + (1:L))
+            new_noncore <- cbind(new_noncore, new_noncore[, i-1] + L)
+          }
         }
+        strat_par <- p + strat_par
       } else {
-        strat_par <- c(1, length(theta_hats[[1]]))
-        noncore <- new_noncore <- cbind(seq_len(L),
-                                        (last_Lam_dim - L + 1):last_Lam_dim)
-        new_noncore[, 2] <- noncore[, 1] + L
+        if (length(strat_par) == 1) {
+          if (1 %in% strat_par) {
+            strat_par <- c(1)
+            noncore <- cbind(seq_len(L))
+            new_noncore <- noncore
+          } else {
+            strat_par <- c(length(theta_hats[[1]]))
+            noncore <- cbind((last_Lam_dim - L + 1):last_Lam_dim)
+            new_noncore <- as.matrix(seq_len(L)) # == noncore - (L+1)
+          }
+        } else {
+          strat_par <- c(1, length(theta_hats[[1]]))
+          noncore <- new_noncore <- cbind(seq_len(L),
+                                          (last_Lam_dim - L + 1):last_Lam_dim)
+          new_noncore[, 2] <- noncore[, 1] + L
+        }
       }
       for (j in seq_len(L)) {
         if (j == 1) {
@@ -389,9 +487,8 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
           Lambda_b_l[L + 1] <- list(Lambda_all[[L + 1]][as.numeric(noncore),
                                                         as.numeric(noncore), drop = FALSE ])
           A_hats_tilda_b_l <- list(A_hats_b_l[[j]] +
-                                     Lambda_b_l[[L + 1]][new_noncore[j, ],
-                                                         new_noncore[j, ], drop = FALSE ] -
-            Lambda_b_l[[j]])
+                                     Lambda_b_l[[L + 1]][new_noncore[j, ], new_noncore[j, ], drop = FALSE] -
+                                     Lambda_b_l[[j]])
           A_hats_tilda_b_l_inv <- list(solve(as.matrix(A_hats_tilda_b_l[[j]])))
           A_hats_ab_l <- list(A_hats[[j]][-strat_par, strat_par, drop = FALSE ])
           theta_hat_a_l <- list(theta_hats[[j]][-strat_par])
@@ -402,8 +499,7 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
           A_hats_b_l[j] <- list(A_hats[[j]][strat_par, strat_par, drop = FALSE ])
           Lambda_b_l[j] <- list(Lambda_all[[j]][strat_par, strat_par, drop = FALSE ])
           A_hats_tilda_b_l[j] <- list(A_hats_b_l[[j]] +
-                                        Lambda_b_l[[L + 1]][new_noncore[j, ],
-                                                            new_noncore[j, ], drop = FALSE ] -
+                                        Lambda_b_l[[L + 1]][new_noncore[j, ], new_noncore[j, ], drop = FALSE] -
                                         Lambda_b_l[[j]])
           A_hats_tilda_b_l_inv[j] <- list(solve(as.matrix(A_hats_tilda_b_l[[j]])))
           A_hats_ab_l[j] <- list(A_hats[[j]][-strat_par, strat_par, drop = FALSE ])
@@ -411,11 +507,9 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
           theta_hat_b_l[j] <- list(theta_hats[[j]][strat_par])
         }
       }
-      A_a_bfi <- Reduce("+", A_hats_a_l) + Lambda_a_l[[L + 1]] -
-        Reduce("+", Lambda_a_l[seq_len(L)])
+      A_a_bfi <- Reduce("+", A_hats_a_l) + Lambda_a_l[[L + 1]] - Reduce("+", Lambda_a_l[seq_len(L)])
       A_hat_ab2 <- Map("%*%", A_hats_ab_l, A_hats_tilda_b_l_inv)
-      A_hat_ab3 <- Map("%*%", A_hat_ab2,
-                       lapply(seq_len(L), function(x) t(A_hats_ab_l[[x]])))
+      A_hat_ab3 <- Map("%*%", A_hat_ab2, lapply(seq_len(L), function(x) t(A_hats_ab_l[[x]])))
       theta_hat_a_1 <- A_a_bfi - Reduce("+", A_hat_ab3)
       A_hat_a_l_1 <- Map("-", A_hats_a_l, A_hat_ab3)
       I_d2 <- lapply(seq_len(L), function(x) diag(length(strat_par)))
@@ -425,16 +519,10 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       map02 <- Map("%*%", A_hats_ab_l, A_hat_a_l_2)
       map2 <- Map("%*%", map02, theta_hat_b_l)
       theta_hat_a_2 <- Map("+", map1, map2)
-      theta_hat_a_bfi <- solve(as.matrix(theta_hat_a_1)) %*%
-        Reduce("+", theta_hat_a_2)
+      theta_hat_a_bfi <- solve(as.matrix(theta_hat_a_1)) %*% Reduce("+", theta_hat_a_2)
       part1 <- Map("%*%", A_hats_b_l, theta_hat_b_l)
-      for (j in seq_len(L)) {
-        if (j == 1) {
-          theta_hat_a_bfi_list <- list(theta_hat_a_bfi)
-        } else {
-          theta_hat_a_bfi_list[j] <- list(theta_hat_a_bfi)
-        }
-      }
+      theta_hat_a_bfi_list <- list(theta_hat_a_bfi)
+      for (j in 2:L) theta_hat_a_bfi_list[j] <- list(theta_hat_a_bfi)
       theta_hat_a_l_a_bfi <- Map("-", theta_hat_a_l, theta_hat_a_bfi_list)
       part2 <- Map("%*%", lapply(seq_len(L), function(x)
         t(A_hats_ab_l[[x]])), theta_hat_a_l_a_bfi)
@@ -442,8 +530,7 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       theta_hat_tilda_b_l <- Map("%*%", A_hats_tilda_b_l_inv, part12)
       name_nuis <- names(theta_hats[[1]])[strat_par]
       nam_non_nuis <- names(theta_hats[[1]])[-strat_par]
-      theta_nuis <- matrix(unlist(theta_hat_tilda_b_l),
-                           ncol = length(strat_par), byrow = TRUE)
+      theta_nuis <- matrix(unlist(theta_hat_tilda_b_l), ncol = length(strat_par), byrow = TRUE)
       colnames(theta_nuis) <- name_nuis
       vec_theta_alls <- new_names <- NULL
       kk <- 0
@@ -467,8 +554,7 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       A_bfi[-noncore, -noncore] <- A_a_bfi
       for (j in seq_len(L)) {
         A_bfi[noncore[j, ], noncore[j, ]] <- A_hats_tilda_b_l[[j]]
-        A_bfi[noncore[j, ], -noncore] <- A_bfi[-noncore, noncore[j, ]] <-
-          A_hats_ab_l[[j]]
+        A_bfi[noncore[j, ], -noncore] <- A_bfi[-noncore, noncore[j, ]] <- A_hats_ab_l[[j]]
       }
       sd_bfi <- sqrt(diag(solve(as.matrix(A_bfi))))
     } else {
@@ -639,9 +725,13 @@ bfi <- function(theta_hats = NULL, A_hats, Lambda,
       }
       sd_bfi <- sqrt(diag(solve(as.matrix(A_bfi))))
     }
+    ATE <- NULL
+    # sample_var <- NULL
   }
-  output <- list(theta_hat = theta_hat_bfi, A_hat = A_bfi, sd = sd_bfi,
-                 family = family, basehaz = basehaz, stratified = stratified)
+  if (family != "survival") basehaz <- NULL
+  output <- list(theta_hat = theta_hat_bfi, A_hat = A_bfi, sd = sd_bfi, family = family,
+                 basehaz = basehaz, stratified = stratified, strat_par = old_strat_par,
+                 Ave_Treat = ATE) #S_var = sample_var
   class(output) <- "bfi"
   return(output)
 }

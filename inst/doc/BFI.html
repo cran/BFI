@@ -13,9 +13,9 @@
 <meta name="author" content="Hassan Pazira" />
 <meta name="author" content="Marianne Jonker" />
 
-<meta name="date" content="2024-07-03" />
+<meta name="date" content="2025-03-22" />
 
-<title>An Introduction to BFI</title>
+<title>An Introduction to BFI in R</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', function(e) {
   }
 });
 </script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rstudio/markdown/inst/resources/prism-xcode.css" data-external="1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/yihui/knitr/inst/misc/vignette.css" data-external="1">
+<script src="https://cdn.jsdelivr.net/combine/npm/@xiee/utils/js/code-lang.min.js,npm/@xiee/utils/js/number-captions.min.js,npm/prismjs@1.29.0/components/prism-core.min.js" data-external="1" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js" data-external="1" defer></script>
 
 <style type="text/css">
 code{white-space: pre-wrap;}
@@ -42,330 +46,10 @@ ul.task-list{list-style: none;}
 
 
 
-<style type="text/css">
-code {
-white-space: pre;
-}
-.sourceCode {
-overflow: visible;
-}
-</style>
-<style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-color: #aaaaaa;
-}
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
-div.sourceCode
-{ }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } 
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.at { color: #7d9029; } 
-code span.bn { color: #40a070; } 
-code span.bu { color: #008000; } 
-code span.cf { color: #007020; font-weight: bold; } 
-code span.ch { color: #4070a0; } 
-code span.cn { color: #880000; } 
-code span.co { color: #60a0b0; font-style: italic; } 
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.do { color: #ba2121; font-style: italic; } 
-code span.dt { color: #902000; } 
-code span.dv { color: #40a070; } 
-code span.er { color: #ff0000; font-weight: bold; } 
-code span.ex { } 
-code span.fl { color: #40a070; } 
-code span.fu { color: #06287e; } 
-code span.im { color: #008000; font-weight: bold; } 
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
-code span.kw { color: #007020; font-weight: bold; } 
-code span.op { color: #666666; } 
-code span.ot { color: #007020; } 
-code span.pp { color: #bc7a00; } 
-code span.sc { color: #4070a0; } 
-code span.ss { color: #bb6688; } 
-code span.st { color: #4070a0; } 
-code span.va { color: #19177c; } 
-code span.vs { color: #4070a0; } 
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
-</style>
-<script>
-// apply pandoc div.sourceCode style to pre.sourceCode instead
-(function() {
-  var sheets = document.styleSheets;
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
-    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    var j = 0;
-    while (j < rules.length) {
-      var rule = rules[j];
-      // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
-        j++;
-        continue;
-      }
-      var style = rule.style.cssText;
-      // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') {
-        j++;
-        continue;
-      }
-      // replace div.sourceCode by a pre.sourceCode rule
-      sheets[i].deleteRule(j);
-      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
-    }
-  }
-})();
-</script>
 
 
 
 
-<style type="text/css">body {
-background-color: #fff;
-margin: 1em auto;
-max-width: 800px;
-overflow: visible;
-padding-left: 2em;
-padding-right: 2em;
-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-font-size: 14px;
-line-height: 20px;
-}
-#header {
-text-align: center;
-}
-#TOC {
-clear: both;
-margin: 0 0 10px 0;
-padding: 4px;
-border: 1px solid #CCCCCC;
-border-radius: 5px;
-background-color: #f6f6f6;
-font-size: 13px;
-line-height: 1.3;
-}
-#TOC .toctitle {
-font-weight: bold;
-font-size: 15px;
-margin-left: 5px;
-}
-#TOC ul {
-padding-left: 40px;
-margin-left: -1.5em;
-margin-top: 5px;
-margin-bottom: 5px;
-}
-#TOC ul ul {
-margin-left: -2em;
-}
-#TOC li {
-line-height: 16px;
-}
-table:not([class]) {
-margin: auto;
-min-width: 40%;
-border-width: 1px;
-border-color: #DDDDDD;
-border-style: outset;
-border-collapse: collapse;
-}
-table[summary="R argblock"] {
-width: 100%;
-border: none;
-}
-table:not([class]) th {
-border-width: 2px;
-padding: 5px;
-border-style: inset;
-}
-table:not([class]) td {
-border-width: 1px;
-border-style: inset;
-line-height: 18px;
-padding: 5px 5px;
-}
-table:not([class]), table:not([class]) th, table:not([class]) td {
-border-left-style: none;
-border-right-style: none;
-}
-table:not([class]) tr.odd {
-background-color: #f7f7f7;
-}
-p {
-margin: 0.5em 0;
-}
-blockquote {
-background-color: #f6f6f6;
-padding: 13px;
-padding-bottom: 1px;
-}
-hr {
-border-style: solid;
-border: none;
-border-top: 1px solid #777;
-margin: 28px 0;
-}
-dl {
-margin-left: 0;
-}
-dl dd {
-margin-bottom: 13px;
-margin-left: 13px;
-}
-dl dt {
-font-weight: bold;
-}
-ul {
-margin-top: 0;
-}
-ul li {
-list-style: circle outside;
-}
-ul ul {
-margin-bottom: 0;
-}
-pre, code {
-background-color: #f5f5f5;
-border-radius: 3px;
-color: #333;
-}
-pre {
-overflow-x: auto;
-border-radius: 3px;
-margin: 5px 0 10px 0;
-padding: 10px;
-}
-pre:not([class]) {
-background-color: white;
-border: #f5f5f5 1px solid;
-}
-pre:not([class]) code {
-color: #444;
-background-color: white;
-}
-code {
-font-family: monospace;
-font-size: 90%;
-}
-p > code, li > code {
-padding: 2px 4px;
-color: #d14;
-border: 1px solid #e1e1e8;
-white-space: inherit;
-}
-div.figure {
-text-align: center;
-}
-table > caption, div.figure p.caption {
-font-style: italic;
-}
-table > caption span, div.figure p.caption span {
-font-style: normal;
-font-weight: bold;
-}
-p {
-margin: 0 0 10px;
-}
-table:not([class]) {
-margin: auto auto 10px auto;
-}
-img:not([class]) {
-background-color: #FFFFFF;
-padding: 2px;
-border-radius: 3px;
-border: 1px solid #CCCCCC;
-margin: 0 5px;
-max-width: 100%;
-}
-h1 {
-margin-top: 0;
-font-size: 35px;
-line-height: 40px;
-}
-h2 {
-border-bottom: 4px solid #f5f5f5;
-padding-top: 10px;
-padding-bottom: 2px;
-font-size: 145%;
-}
-h3 {
-border-bottom: 2px solid #f5f5f5;
-padding-top: 10px;
-font-size: 120%;
-}
-h4 {
-border-bottom: 1px solid #f5f5f5;
-margin-left: 8px;
-font-size: 105%;
-}
-h5, h6 {
-border-bottom: 1px solid #ccc;
-font-size: 105%;
-}
-a {
-color: #0033dd;
-text-decoration: none;
-}
-a:hover {
-color: #6666ff; }
-a:visited {
-color: #800080; }
-a:visited:hover {
-color: #BB00BB; }
-a[href^="http:"] {
-text-decoration: underline; }
-a[href^="https:"] {
-text-decoration: underline; }
-div.r-help-page {
-background-color: #f9f9f9;
-border-bottom: #ddd 1px solid;
-margin-bottom: 10px;
-padding: 10px;
-}
-div.r-help-page:hover {
-background-color: #f4f4f4;
-}
-
-code > span.kw { color: #555; font-weight: bold; } 
-code > span.dt { color: #902000; } 
-code > span.dv { color: #40a070; } 
-code > span.bn { color: #d14; } 
-code > span.fl { color: #d14; } 
-code > span.ch { color: #d14; } 
-code > span.st { color: #d14; } 
-code > span.co { color: #888888; font-style: italic; } 
-code > span.ot { color: #007020; } 
-code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; } 
-code > span.er { color: #a61717; background-color: #e3d2d2; } 
-</style>
 
 
 
@@ -377,10 +61,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">An Introduction to BFI</h1>
+<h1 class="title toc-ignore">An Introduction to BFI in R</h1>
 <h4 class="author">Hassan Pazira</h4>
 <h4 class="author">Marianne Jonker</h4>
-<h4 class="date">2024-07-03</h4>
+<h4 class="date">2025-03-22</h4>
 
 
 <div id="TOC">
@@ -403,38 +87,39 @@ estimations</a></li>
 <h2>Overview</h2>
 <p>The R package <code>BFI</code> (<strong>B</strong>ayesian
 <strong>F</strong>ederated <strong>I</strong>nference) provides several
-functions to carry out the Bayesian Federated Inference method for two
-types of models (<code>GLM</code> and <code>Survival</code>) using
-multicenter data without the need to combine or share them. This
-tutorial focuses on <code>GLM</code> models. Two commonly used families
-for <code>GLM</code> models, <code>&quot;binomial&quot;</code> and
-<code>&quot;gaussian&quot;</code>, are available for this version of the package.
-The mostly using functions include <code>bfi()</code>,
-<code>MAP.estimation()</code>, and <code>inv.prior.cov()</code>. In the
-following, we will see how the <code>BFI</code> package can be applied
-to real datasets included in the package.</p>
+functions to perform Bayesian Federated Inference for two types of
+models (<code>GLM</code> and <code>Survival</code>) using multicenter
+data without the need to combine or share them. This tutorial focuses on
+<code>GLM</code> models. Two commonly used families for <code>GLM</code>
+models, <code>&quot;binomial&quot;</code> and <code>&quot;gaussian&quot;</code>, are
+available for this version of the package. The most commonly used
+functions include <code>bfi()</code>, <code>MAP.estimation()</code>, and
+<code>inv.prior.cov()</code>. In the following, we will see how the
+<code>BFI</code> package can be applied to real data sets included in
+the package.</p>
 </div>
 <div id="how-to-use-it" class="section level2">
 <h2>How to use it?</h2>
 <p>Before we go on, we first install and load the <code>BFI</code>
 package:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Install and load the BFI package from CRAN:</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;BFI&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(BFI)</span></code></pre></div>
+<pre class="r"><code># Install and load the BFI package from CRAN:
+install.packages(&quot;BFI&quot;)
+library(BFI)</code></pre>
+<pre><code>## Warning: package &#39;BFI&#39; was built under R version 4.3.3</code></pre>
 <p>By using the following code, we can see that there are two available
-datasets in the package: <code>trauma</code> and
+data sets in the package: <code>trauma</code> and
 <code>Nurses</code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">data</span>(<span class="at">package =</span> <span class="st">&quot;BFI&quot;</span>)</span></code></pre></div>
-<p>The <code>trauma</code> dataset can be utilized for the
-<code>&quot;binomial&quot;</code> family and <code>Nurses</code> dataset can be
+<pre class="r"><code>data(package = &quot;BFI&quot;)</code></pre>
+<p>The <code>trauma</code> data set can be utilized for the
+<code>&quot;binomial&quot;</code> family and <code>Nurses</code> data set can be
 used for <code>&quot;gaussian&quot;</code> family. To avoid repetition, we will
-only use the <code>trauma</code> dataset. By loading the package, the
-datasets included will be loaded and can be inspected as follows:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Get the number of rows and columns</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">dim</span>(trauma)</span></code></pre></div>
+only use the <code>trauma</code> data set. By loading the package, the
+data sets included will be loaded and can be inspected as follows:</p>
+<pre class="r"><code># Get the number of rows and columns
+dim(trauma)</code></pre>
 <pre><code>## [1] 371   6</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># To get an idea of the dataset, print the first 7 rows</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">head</span>(trauma, <span class="dv">7</span>)</span></code></pre></div>
+<pre class="r"><code># To get an idea of the data set, print the first 7 rows
+head(trauma, 7)</code></pre>
 <pre><code>##   sex age hospital ISS GCS mortality
 ## 1   1  20        3  24  15         0
 ## 2   0  38        3  34  13         0
@@ -443,52 +128,51 @@ datasets included will be loaded and can be inspected as follows:</p>
 ## 5   0  49        3  29  15         0
 ## 6   0  30        3  22  15         0
 ## 7   1  84        2  66   3         1</code></pre>
-<p>This dataset consists of data of 371 trauma patients from three
+<p>This data set consists of data of 371 trauma patients from three
 hospitals (peripheral hospital without a neuro-surgical unit,
 <code>&#39;status=1&#39;</code>, peripheral hospital with a neuro-surgical unit,
 <code>status=2</code>, and academic medical center,
 <code>status=3</code>).</p>
-<p>As we can see, it has 6 columns:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>(col_name <span class="ot">&lt;-</span> <span class="fu">colnames</span>(trauma))</span></code></pre></div>
-<pre><code>## [1] &quot;sex&quot;       &quot;age&quot;       &quot;hospital&quot;  &quot;ISS&quot;       &quot;GCS&quot;       &quot;mortality&quot;</code></pre>
-<p>The covariates <code>sex</code> (dichotomous), <code>age</code>
-(continuous), <code>ISS</code> (Injury Severity Score, continuous), and
-<code>GCS</code> (Glasgow Coma Scale, continuous) are the predictors,
-and <code>mortality</code> is the response variable.
+<p>As we can see, the data set has six columns. The covariates
+<code>sex</code> (dichotomous), <code>age</code> (continuous),
+<code>ISS</code> (Injury Severity Score, continuous), and
+<code>GCS</code> (Glasgow Coma Scale, continuous), which serve as the
+predictors. <code>mortality</code> is the response variable, while
 <code>hospital</code> is a categorical variable which indicates the
-hospitals involved in the study. For more information about this dataset
-use</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Get some info about the dataset from the help file</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>?trauma</span></code></pre></div>
+hospitals involved in the study. For more information about this data
+set use</p>
+<pre class="r"><code># Get some info about the data set from the help file
+?trauma</code></pre>
 <p>We will analyze the data with a <code>logistic</code> regression
 model. First we standardize the covariates. This is not necessary for
 the analysis, but is done for the interpretability of the accuracy of
 the estimates.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>trauma<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">scale</span>(trauma<span class="sc">$</span>age)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>trauma<span class="sc">$</span>ISS <span class="ot">&lt;-</span> <span class="fu">scale</span>(trauma<span class="sc">$</span>ISS) </span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>trauma<span class="sc">$</span>GCS <span class="ot">&lt;-</span> <span class="fu">scale</span>(trauma<span class="sc">$</span>GCS) </span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>trauma<span class="sc">$</span>hospital <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(trauma<span class="sc">$</span>hospital)</span></code></pre></div>
+<pre class="r"><code>trauma$age &lt;- scale(trauma$age)
+trauma$ISS &lt;- scale(trauma$ISS) 
+trauma$GCS &lt;- scale(trauma$GCS) 
+trauma$hospital &lt;- as.factor(trauma$hospital)</code></pre>
 <p>By using the following code we can see there are three hospitals
 involved in the study:</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">levels</span>(trauma<span class="sc">$</span>hospital))</span></code></pre></div>
+<pre class="r"><code>length(levels(trauma$hospital))</code></pre>
 <pre><code>## [1] 3</code></pre>
 <div id="map-estimations" class="section level3">
 <h3>MAP estimations</h3>
 <p>Therefore, the <code>MAP.estimation</code> function should be applied
-to these 3 local datasets separately to obtain the MAP estimations. Note
-that, in practice, we do not have access to the combined data, and each
-center should perform the analysis independently and send the output to
-the central server, as follows:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Center 1:</span></span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>X1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex=</span>trauma<span class="sc">$</span>sex[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">1</span>],</span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>                 <span class="at">age=</span>trauma<span class="sc">$</span>age[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">1</span>],</span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>                 <span class="at">ISS=</span>trauma<span class="sc">$</span>ISS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">1</span>],</span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>                 <span class="at">GCS=</span>trauma<span class="sc">$</span>GCS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">1</span>])</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>Lambda1 <span class="ot">&lt;-</span> <span class="fu">inv.prior.cov</span>(X1, <span class="at">lambda=</span><span class="fl">0.01</span>, <span class="at">L=</span><span class="dv">3</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">MAP.estimation</span>(<span class="at">y=</span>trauma<span class="sc">$</span>mortality[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">1</span>], <span class="at">X=</span>X1, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, <span class="at">Lambda=</span>Lambda1)</span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="fu">summary</span>(fit1)</span></code></pre></div>
+to these 3 local data sets separately to obtain the MAP estimations.
+Note that, in practice, we do not have access to the combined data, and
+each center should perform the analysis independently and send the
+output to the central server, as follows:</p>
+<pre class="r"><code># Center 1:
+# X1 &lt;- data.frame(sex=trauma$sex[trauma$hospital==1],
+#                  age=trauma$age[trauma$hospital==1],
+#                  ISS=trauma$ISS[trauma$hospital==1],
+#                  GCS=trauma$GCS[trauma$hospital==1])
+X1 &lt;- subset(trauma, hospital == 1, select = c(sex, age, ISS, GCS))
+Lambda1 &lt;- inv.prior.cov(X1, lambda=0.01, L=3, family=&quot;binomial&quot;)
+fit1 &lt;- MAP.estimation(y=trauma$mortality[trauma$hospital==1], X=X1, family=&quot;binomial&quot;, Lambda=Lambda1)
+summary(fit1)</code></pre>
 <pre><code>## 
-## Summary of the model:
+## Summary of the local model:
 ## 
 ##    Formula: y ~ sex + age + ISS + GCS 
 ##     Family: &#39;binomial&#39; 
@@ -498,24 +182,25 @@ the central server, as follows:</p>
 ## 
 ##             Estimate Std.Dev  CI 2.5% CI 97.5%
 ## (Intercept)  -2.1226  0.8074  -3.7050  -0.5402
-## sex          -5.2796  2.6305 -10.4352  -0.1239
+## sex          -5.2795  2.6305 -10.4351  -0.1239
 ## age           1.8864  0.7210   0.4732   3.2996
-## ISS           2.3741  0.9251   0.5611   4.1872
+## ISS           2.3741  0.9250   0.5611   4.1872
 ## GCS          -2.4522  0.8295  -4.0781  -0.8264
 ## 
 ## Dispersion parameter (sigma2):  1 
 ##             log Lik Posterior:  -10.74 
 ##                   Convergence:  0</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Center 2:</span></span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>X2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex=</span>trauma<span class="sc">$</span>sex[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">2</span>],</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>                 <span class="at">age=</span>trauma<span class="sc">$</span>age[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">2</span>],</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>                 <span class="at">ISS=</span>trauma<span class="sc">$</span>ISS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">2</span>],</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>                 <span class="at">GCS=</span>trauma<span class="sc">$</span>GCS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">2</span>])</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>Lambda2 <span class="ot">&lt;-</span> <span class="fu">inv.prior.cov</span>(X2, <span class="at">lambda=</span><span class="fl">0.01</span>, <span class="at">L=</span><span class="dv">3</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">MAP.estimation</span>(<span class="at">y=</span>trauma<span class="sc">$</span>mortality[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">2</span>], <span class="at">X=</span>X2, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, <span class="at">Lambda=</span>Lambda2)</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="fu">summary</span>(fit2)</span></code></pre></div>
+<pre class="r"><code># Center 2:
+# X2 &lt;- data.frame(sex=trauma$sex[trauma$hospital==2],
+#                  age=trauma$age[trauma$hospital==2],
+#                  ISS=trauma$ISS[trauma$hospital==2],
+#                  GCS=trauma$GCS[trauma$hospital==2])
+X2 &lt;- subset(trauma, hospital == 2, select = c(sex, age, ISS, GCS))
+Lambda2 &lt;- inv.prior.cov(X2, lambda=0.01, L=3, family=&quot;binomial&quot;)
+fit2 &lt;- MAP.estimation(y=trauma$mortality[trauma$hospital==2], X=X2, family=&quot;binomial&quot;, Lambda=Lambda2)
+summary(fit2)</code></pre>
 <pre><code>## 
-## Summary of the model:
+## Summary of the local model:
 ## 
 ##    Formula: y ~ sex + age + ISS + GCS 
 ##     Family: &#39;binomial&#39; 
@@ -526,23 +211,24 @@ the central server, as follows:</p>
 ##             Estimate Std.Dev CI 2.5% CI 97.5%
 ## (Intercept)  -0.7854  0.3789 -1.5280  -0.0427
 ## sex          -0.7850  0.6999 -2.1568   0.5868
-## age           1.9601  0.4662  1.0465   2.8737
+## age           1.9601  0.4662  1.0465   2.8738
 ## ISS           0.5216  0.3673 -0.1983   1.2415
 ## GCS          -1.8737  0.4115 -2.6803  -1.0672
 ## 
 ## Dispersion parameter (sigma2):  1 
 ##             log Lik Posterior:  -36.87 
 ##                   Convergence:  0</code></pre>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="co"># Center 3:</span></span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>X3 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex=</span>trauma<span class="sc">$</span>sex[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">3</span>],</span>
-<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>                 <span class="at">age=</span>trauma<span class="sc">$</span>age[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">3</span>],</span>
-<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>                 <span class="at">ISS=</span>trauma<span class="sc">$</span>ISS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">3</span>],</span>
-<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>                 <span class="at">GCS=</span>trauma<span class="sc">$</span>GCS[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">3</span>])</span>
-<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>Lambda3 <span class="ot">&lt;-</span> <span class="fu">inv.prior.cov</span>(X3, <span class="at">lambda=</span><span class="fl">0.01</span>, <span class="at">L=</span><span class="dv">3</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">MAP.estimation</span>(<span class="at">y=</span>trauma<span class="sc">$</span>mortality[trauma<span class="sc">$</span>hospital<span class="sc">==</span><span class="dv">3</span>], <span class="at">X=</span>X3, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, <span class="at">Lambda=</span>Lambda3)</span>
-<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a><span class="fu">summary</span>(fit3)</span></code></pre></div>
+<pre class="r"><code># Center 3:
+# X3 &lt;- data.frame(sex=trauma$sex[trauma$hospital==3],
+#                  age=trauma$age[trauma$hospital==3],
+#                  ISS=trauma$ISS[trauma$hospital==3],
+#                  GCS=trauma$GCS[trauma$hospital==3])
+X3 &lt;- subset(trauma, hospital == 3, select = c(sex, age, ISS, GCS))
+Lambda3 &lt;- inv.prior.cov(X3, lambda=0.01, L=3, family=&quot;binomial&quot;)
+fit3 &lt;- MAP.estimation(y=trauma$mortality[trauma$hospital==3], X=X3, family=&quot;binomial&quot;, Lambda=Lambda3)
+summary(fit3)</code></pre>
 <pre><code>## 
-## Summary of the model:
+## Summary of the local model:
 ## 
 ##    Formula: y ~ sex + age + ISS + GCS 
 ##     Family: &#39;binomial&#39; 
@@ -555,45 +241,67 @@ the central server, as follows:</p>
 ## sex           0.1580  0.5714 -0.9619   1.2780
 ## age           1.3031  0.2955  0.7239   1.8824
 ## ISS           0.2967  0.2638 -0.2203   0.8138
-## GCS          -2.4221  0.4130 -3.2316  -1.6126
+## GCS          -2.4221  0.4130 -3.2316  -1.6125
 ## 
 ## Dispersion parameter (sigma2):  1 
 ##             log Lik Posterior:  -50.63 
 ##                   Convergence:  0</code></pre>
-<p>It can be seen that all algorithms converged
-(<code>Convergence: 0</code>). To see more information about the
-dataset, such as the number of observations and parameters, we can use
-the output of the <code>MAP.estimation</code> function as follows:</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># number of samples in center 1</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>fit1<span class="sc">$</span>n</span></code></pre></div>
+<p>It can be seen that all algorithms have converged
+(<code>Convergence: 0</code>). If <code>Convergence: 1</code> occurs,
+you can increase the number of iteration in the optimization process of
+<code>optim()</code> by adding <code>control = list(maxit=500)</code> to
+the function <code>MAP.estimation</code>, as shown below:</p>
+<pre class="r"><code># Example for Center 3:
+fit3 &lt;- MAP.estimation(y=trauma$mortality[trauma$hospital==3], X=X3, family=&quot;binomial&quot;, Lambda=Lambda3, control = list(maxit=500))</code></pre>
+<p>To see more information about the data set, such as the number of
+observations and parameters, we can use the output of the
+<code>MAP.estimation</code> function as follows:</p>
+<pre class="r"><code># number of samples in center 1
+fit1$n</code></pre>
 <pre><code>## [1] 49</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># number of parameters in center 1</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>fit1<span class="sc">$</span>np</span></code></pre></div>
+<pre class="r"><code># number of parameters in center 1
+fit1$np</code></pre>
 <pre><code>## [1] 5</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># number of samples in center 2</span></span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>fit2<span class="sc">$</span>n</span></code></pre></div>
+<pre class="r"><code># number of samples in center 2
+fit2$n</code></pre>
 <pre><code>## [1] 106</code></pre>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># number of samples in center 3</span></span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>fit3<span class="sc">$</span>n</span></code></pre></div>
+<pre class="r"><code># number of samples in center 3
+fit3$n</code></pre>
 <pre><code>## [1] 216</code></pre>
 <p>Additionally, before conducting the analysis, we can use the
 <code>n.par</code> function to retrieve this information.</p>
+<p>The outputs <code>fit1</code>,<code>fit2</code>, and
+<code>fit3</code> from the local centers should be sent to the central
+server for further analysis. To send these lists from R to the central
+server (which also uses R), you can save them in a format that R can
+easily read, such as an RDS file.</p>
+<pre class="r"><code># Save fit1 as an RDS file
+saveRDS(fit1, file=&quot;fit1.rds&quot;)
+
+# Save fit2 as an RDS file
+saveRDS(fit2, file=&quot;fit2.rds&quot;)
+
+# Save fit3 as an RDS file
+saveRDS(fit3, file=&quot;fit3.rds&quot;)</code></pre>
 </div>
 <div id="bfi-estimations" class="section level3">
 <h3>BFI estimations</h3>
-<p>Then, only the outputs from the local centers (i.e.,
-<code>fit1</code>,<code>fit2</code>, and <code>fit3</code>) should be
-sent to the central server for further analysis. On the central server,
-the <code>bfi()</code> function can be used to obtain the BFI
-estimations:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>theta_hats <span class="ot">&lt;-</span> <span class="fu">list</span>(fit1<span class="sc">$</span>theta_hat, fit2<span class="sc">$</span>theta_hat, fit3<span class="sc">$</span>theta_hat)</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>A_hats     <span class="ot">&lt;-</span> <span class="fu">list</span>(fit1<span class="sc">$</span>A_hat, fit2<span class="sc">$</span>A_hat, fit3<span class="sc">$</span>A_hat)</span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>Lambda_com <span class="ot">&lt;-</span> <span class="fu">inv.prior.cov</span>(X1, <span class="at">lambda=</span><span class="fl">0.01</span>, <span class="at">L=</span><span class="dv">3</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>Lambdas    <span class="ot">&lt;-</span> <span class="fu">list</span>(Lambda1, Lambda2, Lambda3, Lambda_com)</span>
-<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>BFI_fits   <span class="ot">&lt;-</span> <span class="fu">bfi</span>(theta_hats, A_hats, Lambdas)</span>
-<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="fu">summary</span>(BFI_fits, <span class="at">cur_mat=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Now, the received files can be loaded in R using the following
+lines:</p>
+<pre class="r"><code># Load the RDS files
+fit1 &lt;- readRDS(&quot;fit1.rds&quot;) # use the relative path to the file
+fit2 &lt;- readRDS(&quot;fit2.rds&quot;) # use the relative path to the file
+fit3 &lt;- readRDS(&quot;fit3.rds&quot;) # use the relative path to the file</code></pre>
+<p>On the central server, the <code>bfi()</code> function can be used to
+obtain the BFI estimations:</p>
+<pre class="r"><code>theta_hats &lt;- list(fit1$theta_hat, fit2$theta_hat, fit3$theta_hat)
+A_hats     &lt;- list(fit1$A_hat, fit2$A_hat, fit3$A_hat)
+Lambda_com &lt;- inv.prior.cov(X1, lambda=0.01, L=3, family=&quot;binomial&quot;)
+Lambdas    &lt;- list(Lambda1, Lambda2, Lambda3, Lambda_com)
+BFI_fits   &lt;- bfi(theta_hats, A_hats, Lambdas, family=&quot;binomial&quot;)
+summary(BFI_fits, cur_mat=TRUE)</code></pre>
 <pre><code>## 
-## Summary of the model:
+## Summary of the BFI model:
 ## 
 ##     Family: &#39;binomial&#39; 
 ##       Link: &#39;Logit&#39;
@@ -612,26 +320,26 @@ estimations:</p>
 ## Minus the Curvature Matrix: 
 ## 
 ##             (Intercept)     sex     age      ISS      GCS
-## (Intercept)     30.4330  7.7926  0.7577   8.3798 -16.6609
+## (Intercept)     30.4330  7.7926  0.7578   8.3797 -16.6608
 ## sex              7.7926  7.8026  1.3061   1.8414  -4.6925
-## age              0.7577  1.3061 31.5230  -4.8355  15.7494
-## ISS              8.3798  1.8414 -4.8355  30.7882 -11.7190
-## GCS            -16.6609 -4.6925 15.7494 -11.7190  34.4509</code></pre>
+## age              0.7578  1.3061 31.5230  -4.8356  15.7494
+## ISS              8.3797  1.8414 -4.8356  30.7881 -11.7189
+## GCS            -16.6608 -4.6925 15.7494 -11.7189  34.4508</code></pre>
 </div>
 <div id="comparison" class="section level3">
 <h3>Comparison</h3>
 <p>To compare the performance of the BFI methodology, we can combine the
-datasets and obtain the MAP estimations based on the combined data:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># MAP estimates of the combined data:</span></span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>X_combined  <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">sex=</span>trauma<span class="sc">$</span>sex,</span>
-<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a>                          <span class="at">age=</span>trauma<span class="sc">$</span>age,</span>
-<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>                          <span class="at">ISS=</span>trauma<span class="sc">$</span>ISS,</span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>                          <span class="at">GCS=</span>trauma<span class="sc">$</span>GCS)</span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a>Lambda   <span class="ot">&lt;-</span> <span class="fu">inv.prior.cov</span>(<span class="at">X=</span>X_combined, <span class="at">lambda=</span><span class="fl">0.1</span>, <span class="at">L=</span><span class="dv">3</span>, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a>fit_comb  <span class="ot">&lt;-</span> <span class="fu">MAP.estimation</span>(<span class="at">y=</span>trauma<span class="sc">$</span>mortality, <span class="at">X=</span>X_combined, <span class="at">family=</span><span class="st">&quot;binomial&quot;</span>, <span class="at">Lambda=</span>Lambda) </span>
-<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="fu">summary</span>(fit_comb, <span class="at">cur_mat=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+data sets and obtain the MAP estimations based on the combined data:</p>
+<pre class="r"><code># MAP estimates of the combined data:
+X_combined  &lt;- data.frame(sex=trauma$sex,
+                          age=trauma$age,
+                          ISS=trauma$ISS,
+                          GCS=trauma$GCS)
+Lambda   &lt;- inv.prior.cov(X=X_combined, lambda=0.01, L=3, family=&quot;binomial&quot;)
+fit_comb  &lt;- MAP.estimation(y=trauma$mortality, X=X_combined, family=&quot;binomial&quot;, Lambda=Lambda) 
+summary(fit_comb, cur_mat=TRUE)</code></pre>
 <pre><code>## 
-## Summary of the model:
+## Summary of the local model:
 ## 
 ##    Formula: y ~ sex + age + ISS + GCS 
 ##     Family: &#39;binomial&#39; 
@@ -640,30 +348,30 @@ datasets and obtain the MAP estimations based on the combined data:</p>
 ## Coefficients:
 ## 
 ##             Estimate Std.Dev CI 2.5% CI 97.5%
-## (Intercept)  -1.6110  0.2368 -2.0752  -1.1468
-## sex          -0.3346  0.3946 -1.1079   0.4388
-## age           1.3575  0.2034  0.9588   1.7562
-## ISS           0.5490  0.1852  0.1860   0.9119
-## GCS          -1.9808  0.2348 -2.4411  -1.5205
+## (Intercept)  -1.6255  0.2398 -2.0955  -1.1556
+## sex          -0.3357  0.3990 -1.1178   0.4463
+## age           1.3703  0.2056  0.9673   1.7733
+## ISS           0.5498  0.1862  0.1848   0.9149
+## GCS          -1.9981  0.2379 -2.4645  -1.5318
 ## 
 ## Dispersion parameter (sigma2):  1 
-##             log Lik Posterior:  -109.8 
+##             log Lik Posterior:  -109.4 
 ##                   Convergence:  0 
 ## 
 ## Minus the Curvature Matrix: 
 ## 
 ##             (Intercept)     sex     age      ISS      GCS
-## (Intercept)     33.9101  8.5588  2.4320   8.3617 -18.2744
-## sex              8.5588  8.6588  1.8922   1.4043  -4.5371
-## age              2.4320  1.8922 37.5028  -6.1562  18.0250
-## ISS              8.3617  1.4043 -6.1562  33.7608 -12.8879
-## GCS            -18.2744 -4.5371 18.0250 -12.8879  38.8457</code></pre>
+## (Intercept)     33.5675  8.4942  2.3840   8.3535 -18.2832
+## sex              8.4942  8.5042  1.8643   1.4055  -4.5326
+## age              2.3840  1.8643 37.1516  -6.1748  18.0223
+## ISS              8.3535  1.4055 -6.1748  33.4408 -12.8543
+## GCS            -18.2832 -4.5326 18.0223 -12.8543  38.5342</code></pre>
 <p>Now, we can see the difference between the BFI and combined
 estimates:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Squared Errors:</span></span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>(fit_comb<span class="sc">$</span>theta_hat <span class="sc">-</span> BFI_fits<span class="sc">$</span>theta_hat)<span class="sc">^</span><span class="dv">2</span></span></code></pre></div>
-<pre><code>##      (Intercept)         sex        age         ISS        GCS
-## [1,]  0.02811718 0.007613421 0.01921903 0.003037933 0.05919514</code></pre>
+<pre class="r"><code># Squared Errors:
+(fit_comb$theta_hat - BFI_fits$theta_hat)^2</code></pre>
+<pre><code>##      (Intercept)        sex        age         ISS        GCS
+## [1,]  0.03319286 0.00781985 0.02292217 0.003132086 0.06791077</code></pre>
 <p>which are close to zero, as expected!</p>
 <p>For more details see the following references.</p>
 </div>
@@ -674,10 +382,12 @@ estimates:</p>
 inference for estimating statistical models based on non-shared
 multicenter data sets, Statistics in Medicine, 43(12): 2421-2438. <a href="https://doi.org/10.1002/sim.10072" class="uri">https://doi.org/10.1002/sim.10072</a></p>
 <p>Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker
-M.A. (2024). Bayesian Federated Inference for Survival Models, arXiv. <a href="https://arxiv.org/abs/2404.17464" class="uri">https://arxiv.org/abs/2404.17464</a></p>
-<p>Jonker M.A., Pazira H. and Coolen A.C.C. (2024b). Bayesian Federated
-Inference for regression models with heterogeneous multi-center
-populations, arXiv. <a href="https://arxiv.org/abs/2402.02898" class="uri">https://arxiv.org/abs/2402.02898</a></p>
+M.A. (2025b). Bayesian Federated Inference for Survival Models, Journal
+of Applied Statistics (Accepted). <a href="https://arxiv.org/abs/2404.17464" class="uri">https://arxiv.org/abs/2404.17464</a></p>
+<p>Jonker M.A., Pazira H. and Coolen A.C.C. (2025a). Bayesian Federated
+Inference for regression models based on non-shared medical center data,
+Research Synthesis Methods, 1-41. <a href="https://doi.org/10.1017/rsm.2025.6" class="uri">https://doi.org/10.1017/rsm.2025.6</a></p>
+<!-- van den Heuvel Z.D., Pazira H. and Jonker M.A. (2025c). Bayesian Federated Causal Inference from observational data, arXiv. <https://arxiv.org/abs/???> -->
 </div>
 <div id="contact" class="section level2">
 <h2>Contact</h2>
@@ -686,26 +396,6 @@ request that something be added, please file an issue at <a href="https://github
 send an email to: <a href="mailto:hassan.pazira@radboudumc.nl" class="email">hassan.pazira@radboudumc.nl</a> or <a href="mailto:Marianne.Jonker@radboudumc.nl" class="email">Marianne.Jonker@radboudumc.nl</a>.</p>
 </div>
 
-<script type="text/javascript">
-window.onload = function() {
-  var i, fig = 1, caps = document.getElementsByClassName('caption');
-  for (i = 0; i < caps.length; i++) {
-    var cap = caps[i];
-    if (cap.parentElement.className !== 'figure' || cap.nodeName !== 'P')
-      continue;
-    cap.innerHTML = '<span>Figure ' + fig + ':</span> ' + cap.innerHTML;
-    fig++;
-  }
-  fig = 1;
-  caps = document.getElementsByTagName('caption');
-  for (i = 0; i < caps.length; i++) {
-    var cap = caps[i];
-    if (cap.parentElement.nodeName !== 'TABLE') continue;
-    cap.innerHTML = '<span>Table ' + fig + ':</span> ' + cap.innerHTML;
-    fig++;
-  }
-}
-</script>
 
 
 <!-- code folding -->

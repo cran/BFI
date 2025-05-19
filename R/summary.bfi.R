@@ -14,8 +14,13 @@ summary.bfi <- function(object, cur_mat = FALSE,
   }
   if (object$family == c("gaussian")) {
     linkf <- noquote("identity")
-    object$estimate <- as.numeric(object$theta_hat[-length(object$theta_hat)])
-    object$sd <- object$sd[-length(object$sd)]
+    # If is.null(object$stratified)==T, it means the 'object' is from MAP.estimation().
+    if (is.null(object$stratified) | ((!is.null(object$stratified)) & (!c(2) %in% object$strat_par))) {
+      object$estimate <- as.numeric(object$theta_hat[-length(object$theta_hat)])
+      object$sd <- object$sd[-length(object$sd)]
+    } else {
+      object$estimate <- as.numeric(object$theta_hat)
+    }
   }
   if (object$family == c("survival")) {
     linkf <- NULL
@@ -35,7 +40,9 @@ summary.bfi <- function(object, cur_mat = FALSE,
     cat("   Formula: ")
     if (object$family != "survival") cat(object$formula, "\n")
     if (object$family == "survival") {
-      cat(deparse(update.formula(object$formula, Survival(time, status) ~ .)),"\n")
+      if (is.character(object$formula)) {
+        cat(object$formula,"\n")
+      }
     }
   }
   cat("    Family:", sQuote(object$family), "\n")
@@ -45,16 +52,18 @@ summary.bfi <- function(object, cur_mat = FALSE,
   print(round(coef_sd_ci, digits = digits))
   #printCoefmat(coef_sd_ci, digits=digits)
   if (object$family == c("gaussian")) {
-    cat("\nDispersion parameter (sigma2): ",
-        format(object$theta_hat[length(object$theta_hat)],
-               digits = digits
-        ), "\n")
+    if (is.null(object$stratified) | (!is.null(object$stratified) & (!c(2) %in% object$strat_par))) {
+      cat("\nDispersion parameter (sigma2): ",
+          format(object$theta_hat[length(object$theta_hat)],
+                 digits = digits
+          ), "\n")
+    }
   }
   if (object$family == c("binomial")) {
     # cat("\nDispersion parameter (sigma2) for",object$family, "family taken to be 1 \n")
     cat("\nDispersion parameter (sigma2): ", 1, "\n")
   }
-  if (is.null(object$stratified)) {
+  if (is.null(object$stratified)) { # It means the object is from MAP.estimation()
     if (object$family == c("survival")) {
       cat("\nlog Lik Posterior: ", format(-object$value, digits = digits), "\n")
       cat("      Convergence: ", format(object$convergence, digits = digits), "\n")
@@ -64,6 +73,33 @@ summary.bfi <- function(object, cur_mat = FALSE,
     }
     object$logLikPost <- -object$value
     object$value <- NULL
+  } else {
+    if (object$family %in% c("binomial","gaussian")) {
+      if (!is.null(object$Ave_Treat)) {
+        cat("\nAverage Treatment Effect (ATE): ", "\n")
+        cat("\n         IPTW: ", format(object$Ave_Treat$IPTW, digits = digits), "\n")
+        cat("        wIPTW: ", format(object$Ave_Treat$wIPTW, digits = digits), "\n")
+      }
+      # if (!is.null(object$S_var)) {
+      #   cat("\nSample Variance: ", "\n")
+      #   cat("\n    Treatment: ", format(object$S_var$treatment, digits = digits), "\n")
+      #   cat("      Control: ", format(object$S_var$control, digits = digits), "\n")
+      # }
+    }
+    # if (object$family %in% c("survival")) {
+    #   if (object$basehaz != c("unspecified")) {
+    #     if (!is.null(object$Ave_Treat)) {
+    #       cat("\nAverage Treatment Effect (ATE): ", "\n")
+    #       cat("\n         IPTW: ", format(object$Ave_Treat$IPTW, digits = digits), "\n")
+    #       cat("        wIPTW: ", format(object$Ave_Treat$wIPTW, digits = digits), "\n")
+    #     }
+    #     # if (!is.null(object$S_var)) {
+    #     #   cat("\nSample Variance: ", "\n")
+    #     #   cat("\n    Treatment: ", format(object$S_var$treatment, digits = digits), "\n")
+    #     #   cat("      Control: ", format(object$S_var$control, digits = digits), "\n")
+    #     # }
+    #   }
+    # }
   }
   if (cur_mat) {
     # cat("---\n\n")

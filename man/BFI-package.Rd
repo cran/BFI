@@ -9,7 +9,7 @@ The Bayesian Federated Inference method combines inference results from differen
 \tabular{ll}{
 Package: \tab BFI\cr
 Type: \tab Package\cr
-Version: \tab 2.0.1\cr
+Version: \tab 3.0.1\cr
 Date/Publication: \tab 2024-04-27\cr
 License: \tab GPL (>=2)
 }
@@ -25,9 +25,9 @@ Maintainer: Hassan Pazira \email{hassan.pazira@radboudumc.nl}
 \references{
 Jonker M.A., Pazira H. and Coolen A.C.C. (2024). \emph{Bayesian federated inference for estimating statistical models based on non-shared multicenter data sets}, \emph{Statistics in Medicine}, 43(12): 2421-2438. <https://doi.org/10.1002/sim.10072>
 
-Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2024). \emph{Bayesian Federated Inference for Survival Models}, \emph{arXiv}. <https://arxiv.org/abs/2404.17464>
+Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2025b). \emph{Bayesian Federated Inference for Survival Models}, \emph{Journal of Applied Statistics (Accepted)}. <https://arxiv.org/abs/2404.17464>
 
-Jonker M.A., Pazira H. and Coolen A.C.C. (2024). \emph{Bayesian Federated Inference for regression models with heterogeneous multi-center populations}, \emph{arXiv}. <https://arxiv.org/abs/2402.02898>
+Jonker M.A., Pazira H. and Coolen A.C.C. (2025a). \emph{Bayesian Federated Inference for regression models based on non-shared medical center data}, \emph{Research Synthesis Methods}, 1-41. <https://doi.org/10.1017/rsm.2025.6>
 }
 
 \keyword{package}

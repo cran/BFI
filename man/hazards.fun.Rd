@@ -57,7 +57,7 @@ The function \code{hazards.fun()} can be used for prediction purposes with new s
 }
 
 \references{
-Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2024). \emph{Bayesian Federated Inference for Survival Models}, \emph{arXiv}. <https://arxiv.org/abs/2404.17464>
+Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2025b). \emph{Bayesian Federated Inference for Survival Models}, \emph{Journal of Applied Statistics (Accepted)}. <https://arxiv.org/abs/2404.17464>
 }
 
 \author{Hassan Pazira\cr

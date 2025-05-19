@@ -29,9 +29,9 @@ n.par(X, family = c("gaussian", "binomial", "survival"))
 
 \item{n.sample}{the number of samples/observations;}
 
-\item{orig.names}{the original names of the variables (without including the names of dummy variables);}
+\item{orig.names}{the original variable names excluding dummy variable names;}
 
-\item{covar.names}{the names of the variables (together with the names of any dummy variables, if applicable).}
+\item{covar.names}{the variables names, including any dummy variable names (if applicable).}
 
 }
 

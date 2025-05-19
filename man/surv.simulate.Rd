@@ -6,9 +6,18 @@
 When the upper limit of the uniform censoring time distribution is unknown, \code{surv.simulate} can be used separately to obtain the upper limit with a predefined censoring rate.
 }
 \usage{
-surv.simulate(L = 1, Z, beta, a, b, u1 = 0, u2, cen_rate,
+surv.simulate(L = 1,
+              Z,
+              beta,
+              a,
+              b,
+              u1 = 0,
+              u2,
+              cen_rate,
               gen_data_from = c("exp", "weibul", "gomp"),
-              only_u2 = FALSE, n.rep = 100, Trace = FALSE)
+              only_u2 = FALSE,
+              n.rep = 100,
+              Trace = FALSE)
 }
 
 \arguments{
@@ -84,7 +93,7 @@ The function will be updated for \code{gen_data_from = }\dQuote{gomp}.
 }
 
 \references{
-Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2024). \emph{Bayesian Federated Inference for Survival Models}, \emph{arXiv}. <https://arxiv.org/abs/2404.17464>
+Pazira H., Massa E., Weijers J.A.M., Coolen A.C.C. and Jonker M.A. (2025b). \emph{Bayesian Federated Inference for Survival Models}, \emph{Journal of Applied Statistics (Accepted)}. <https://arxiv.org/abs/2404.17464>
 }
 
 \author{Hassan Pazira\cr

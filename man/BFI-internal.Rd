@@ -16,8 +16,6 @@
 
 \code{model.maker()} returns the outcome and design matrix, incorporating dummy variables when categorical covariates are present, e.g., by expanding factors to a set of dummy variables and expanding interactions similarly.
 
-
-
 \code{optim.survival()} is a general-purpose optimization algorithm based on the ``L-BFGS-B'' method, and returns a vector of estimates for the coefficients and baseline hazard parameters.
 
 \code{ql.LRT()} returns an optimal order/degree of the exponentiated polynomial model, obtained by the likelihood ratio test, for the 'cox' family.
