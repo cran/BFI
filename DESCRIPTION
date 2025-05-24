@@ -1,8 +1,8 @@
 Package: BFI
 Type: Package
 Title: Bayesian Federated Inference
-Version: 3.0.1
-Date/Publication: 2025-05-19 08:40:10 UTC
+Version: 3.1.0
+Date/Publication: 2025-05-24 21:50:06 UTC
 Authors@R: c(person(given = "Hassan", family = "Pazira", email = "hassan.pazira@radboudumc.nl", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4266-6877")),
     person(given = "Emanuele", family = "Massa", role = "aut",
@@ -29,5 +29,5 @@ Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 Language: en-US
 NeedsCompilation: no
-Packaged: 2025-05-19 08:30:44 UTC; hassanpazira
+Packaged: 2025-05-23 10:59:27 UTC; hassanpazira
 Repository: CRAN

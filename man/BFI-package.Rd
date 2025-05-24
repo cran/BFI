@@ -9,7 +9,7 @@ The Bayesian Federated Inference method combines inference results from differen
 \tabular{ll}{
 Package: \tab BFI\cr
 Type: \tab Package\cr
-Version: \tab 3.0.1\cr
+Version: \tab 3.1.0\cr
 Date/Publication: \tab 2024-04-27\cr
 License: \tab GPL (>=2)
 }

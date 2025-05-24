@@ -27,7 +27,6 @@ inv.prior.cov <- function(X, lambda = 1, L = 2L,
     if (length(treatment) > 1)
       stop("Only one covariate for treatment.")
     if (treat_round=="first") {
-      if (family == "survival") intercept <- FALSE
       family <- c("binomial")
     }
     if (!is.character(treatment)) stop("Covariate '", treatment,"' should be a character.")

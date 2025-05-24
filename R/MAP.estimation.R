@@ -45,7 +45,6 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
       stop("Only one covariate for treatment.")
     if (!is.character(treatment)) stop("Covariate '", treatment,"' should be a character.")
     if (treat_round=="first") {
-      if (family == "survival") intercept <- FALSE
       family <- c("binomial")
     }
   }
@@ -63,7 +62,7 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
       }
     }
     #X <- X[,sort(colnames(X))]
-    if ((!is.null(treatment))) {
+    if (!is.null(treatment)) {
       if (!treatment %in% colnames(X)) stop("Treatment should be included in X as a covariate.")
       if (nlevels(factor(X[, treatment])) != 2)
         stop("Covariate '", treatment,"' must have only two categories, e.g., 0 and 1.")
@@ -82,7 +81,11 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
     y_X_vars <- model.maker(formula, as.data.frame(X), family)
     # formula1 <- noquote(paste("y", paste(colnames(y_X_vars$X)[-1],
     #                                      collapse=" + "), sep=" ~ "))
-    formula1 <- noquote(paste("y", design_matrix, sep = " ~ "))
+    if (is.null(treatment)) {
+      formula1 <- noquote(paste("y", design_matrix, sep = " ~ "))
+    } else {
+      formula1 <- noquote(paste(treatment, design_matrix, sep = " ~ "))
+    }
     X <- y_X_vars$X
     y <- y_X_vars$y
     if (NROW(y) != NROW(X)) stop("NROW(y) != NROW(X)")
@@ -195,18 +198,30 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
         if (family == "gaussian") initial <- initial[c(1:p,length(initial))]
       }
       if (!is.null(gamma_bfi)) {
-        if (length(gamma_bfi) != dim(X_no_treat)[2])
-          stop("The length of 'gamma_bfi' should be equal to the number of covariates without 'treatment'.",
-               "'gamma_bfi' should consist of regression coefficients only, excluding nuisance parameters.")
         if (is.null(names(gamma_bfi))) {
           if (!is.null(colnames(gamma_bfi))) names(gamma_bfi) <- colnames(gamma_bfi)
           else stop("'gamma_bfi' should have names. names(gamma_bfi) should not be 'NULL'.")
+        }
+        if ("(Intercept)" %in% names(gamma_bfi)) {
+          if (length(gamma_bfi) != dim(X_no_treat)[2]) {
+            if (intercept == FALSE) stop("In the first round, intercept == TRUE, while in the second it is FALSE.")
+            stop("Check the length of 'gamma_bfi'. 'gamma_bfi' should consist of regression coefficients and/or Intercept, excluding nuisance parameters.")
+          }
+          if (!identical(names(gamma_bfi), colnames(X_no_treat)))
+            stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
+        } else {
+          if (length(gamma_bfi) != dim(X_no_treat)[2]) {
+            if (intercept == TRUE) stop("In the first round, intercept == FALSE, while in the second it is TRUE.")
+            stop("Check the length of 'gamma_bfi'. 'gamma_bfi' should consist of regression coefficients and/or Intercept, excluding nuisance parameters.")
+          }
+          if (!identical(names(gamma_bfi), colnames(X_no_treat)))
+            stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
         }
         if (!identical(names(gamma_bfi), colnames(X_no_treat)))
           stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
         beta_bfi <- gamma_bfi
         eli <- exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi))))/
-          (1 + exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi)))))
+            (1 + exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi)))))
       }
       if (!is.null(RCT_propens)) {
         if (length(RCT_propens) != nrow(X))
@@ -340,7 +355,11 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
     design_matrix <- paste(colnames(X), collapse=" + ")
     formula <- as.formula(paste(" ", design_matrix, sep=" ~ "))
     X_vars <- model.maker(formula, as.data.frame(X), family="survival")
-    formula1 <- noquote(paste("y", design_matrix, sep = " ~ "))
+    if (is.null(treatment)) {
+      formula1 <- noquote(paste("y", design_matrix, sep = " ~ "))
+    } else {
+      formula1 <- noquote(paste("y", treatment, sep = " ~ "))
+    }
     X <- X_vars$X[,-1, drop=F]
     if (NROW(y) != NROW(X)) stop("NROW(y) != NROW(X)")
     p <- ncol(X)
@@ -395,22 +414,31 @@ MAP.estimation <- function(y, X, family = c("gaussian", "binomial", "survival"),
       colnames(X) <- treatment
       p <- NCOL(X)
       if (!is.null(gamma_bfi)) {
-        if (length(gamma_bfi) != dim(X_no_treat)[2]) {
-          if ("(Intercept)" %in% names(gamma_bfi))
-            stop("'gamma_bfi' should not have the intercept.")
-          else
-            stop("The length of 'gamma_bfi' should be equal to the number of covariates without 'treatment'.",
-               "'gamma_bfi' should consist of regression coefficients only, excluding nuisance parameters.")
-        }
         if (is.null(names(gamma_bfi))) {
           if (!is.null(colnames(gamma_bfi))) names(gamma_bfi) <- colnames(gamma_bfi)
           else stop("'gamma_bfi' should have names. names(gamma_bfi) should not be 'NULL'.")
         }
-        if (!identical(names(gamma_bfi), colnames(X_no_treat)))
-          stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
+        if ("(Intercept)" %in% names(gamma_bfi)) {
+          if ((length(gamma_bfi)-1) != dim(X_no_treat)[2]) {
+            stop("Check the length of 'gamma_bfi'. 'gamma_bfi' should consist of regression coefficients and/or Intercept, excluding nuisance parameters.")
+          }
+          if (!identical(names(gamma_bfi)[-1], colnames(X_no_treat)))
+            stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
+        } else {
+          if ((length(gamma_bfi)) != dim(X_no_treat)[2]) {
+            stop("Check the length of 'gamma_bfi'. 'gamma_bfi' should consist of regression coefficients and/or Intercept, excluding nuisance parameters.")
+          }
+          if (!identical(names(gamma_bfi), colnames(X_no_treat)))
+            stop("names(gamma_bfi) and X[, -which(colnames(X) == treatment)] differ in elements, order, or both.")
+        }
         beta_bfi <- gamma_bfi
-        eli <- exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi))))/
-          (1 + exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi)))))
+        if ("(Intercept)" %in% names(gamma_bfi)) {
+          eli <- exp(as.numeric(as.matrix(cbind(1, X_no_treat)) %*% as.numeric(t(beta_bfi))))/
+            (1 + exp(as.numeric(as.matrix(cbind(1, X_no_treat)) %*% as.numeric(t(beta_bfi)))))
+        } else {
+          eli <- exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi))))/
+            (1 + exp(as.numeric(as.matrix(X_no_treat) %*% as.numeric(t(beta_bfi)))))
+        }
       }
       if (!is.null(RCT_propens)) {
         if (length(RCT_propens) != nrow(X))

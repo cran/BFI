@@ -1,4 +1,8 @@
-# BFI v3.0.1 (Latest)
+# BFI v3.1.0 (Latest)
+* The `MAP.estimation` function has been revised, and corresponding updates have been made to its documentation and examples.
+* This version marks the final contribution of Hassan Pazira as the package maintainer. The new maintainer for future versions is Marianne A. Jonker <Marianne.Jonker@radboudumc.nl>
+
+# BFI v3.0.1
 * In this release, the package has been updated to support both observational and randomized trial data for estimating treatment effects using Bayesian Federated 'Causal' Inference.
 
 # BFI v2.1.0
