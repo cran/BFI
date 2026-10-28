@@ -1,8 +1,8 @@
 Package: BFI
 Type: Package
 Title: Bayesian Federated Inference
-Version: 3.2.0
-Date: 2026-09-25
+Version: 3.3.0
+Date: 2026-10-25
 Authors@R: c(person(given = "Hassan", family = "Pazira", email = "h.pazira@arq.org", 
     role = c("aut", "cre"), comment = c(ORCID = "0000-0002-4266-6877")),
     person(given = "Emanuele", family = "Massa", role = "aut",
@@ -20,7 +20,7 @@ License: MIT + file LICENSE
 URL: https://hassanpazira.github.io/BFI/
 Encoding: UTF-8
 Suggests: knitr, rmarkdown, roxygen2, devtools, spelling, testthat (>=
-        3.0.0)
+        3.0.0), survival
 VignetteBuilder: knitr
 Depends: R (>= 3.5.0)
 LazyData: true
@@ -29,6 +29,6 @@ Config/testthat/edition: 3
 RoxygenNote: 7.3.3
 Language: en-US
 NeedsCompilation: no
-Packaged: 2026-09-25 23:43:16 UTC; HPazira
+Packaged: 2026-10-28 12:41:09 UTC; HPazira
 Repository: CRAN
-Date/Publication: 2026-09-26 13:30:17 UTC
+Date/Publication: 2026-10-28 15:00:02 UTC
